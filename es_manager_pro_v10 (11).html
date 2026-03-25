@@ -1,0 +1,3289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ES Manager Pro - Ultimate v10 (Mobile Optimized)</title>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f0f4f8;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --google-cal: #4285F4;
+            --event-color: #8b5cf6;
+            --deadline-color: #f43f5e;
+            --mypage-color: #10b981;
+            --accent: #f59e0b;
+            --success: #22c55e;
+            --interview-color: #7c3aed;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.05);
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 1020px; margin: 0 auto; }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border);
+        }
+        h1 { margin: 0; font-size: 24px; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+
+        /* ---- Stats ---- */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 22px; }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        .stat-value { font-size: 26px; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 11px; color: #64748b; margin-top: 3px; }
+
+        /* ---- Tabs ---- */
+        .tabs { 
+            display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 2px solid var(--border); 
+            overflow-x: auto; 
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab-btn {
+            padding: 12px 18px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-weight: 700;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: 0.2s;
+            margin-bottom: -2px;
+        }
+        .tab-btn:hover { color: var(--primary); background: #f1f5f9; border-radius: 6px 6px 0 0; }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+        /* ---- Buttons ---- */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+        .btn:hover { opacity: 0.88; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-secondary { background: #f1f5f9; color: #475569; border: 1px solid var(--border); }
+        .btn-danger { background: #fee2e2; color: var(--danger); }
+        .btn-google { background: #fff; color: var(--google-cal); border: 1px solid var(--google-cal); }
+        .btn-ai { background: linear-gradient(135deg, #ede9fe, #ddd6fe); color: #6d28d9; border: 1px solid #c4b5fd; }
+        .btn-green { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .btn-orange { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+        .btn-sm { padding: 8px 12px; font-size: 13px; }
+        .btn-xs { padding: 6px 10px; font-size: 12px; }
+
+        /* ---- View Sections ---- */
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+        /* ---- Card base ---- */
+        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+
+        /* ---- ES Company Cards ---- */
+        .es-card {
+            background: var(--card-bg);
+            padding: 18px 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 14px;
+            border: 1px solid var(--border);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .es-card:hover { border-color: var(--primary); box-shadow: 0 6px 16px rgba(37,99,235,0.1); }
+        .es-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+        .company-name { font-size: 17px; font-weight: 700; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 7px; }
+        .company-name:hover { color: var(--primary); }
+        .star-active { color: var(--accent); }
+        .star-inactive { color: #cbd5e1; }
+
+        /* ---- Status Badge ---- */
+        .status-badge { padding: 3px 11px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+        .status-Draft     { background: #f1f5f9; color: #475569; }
+        .status-Submitted { background: #dcfce7; color: #166534; }
+        .status-Passed    { background: #fef9c3; color: #854d0e; }
+        .status-Int1      { background: #dbeafe; color: #1e40af; }
+        .status-Int2      { background: #ede9fe; color: #5b21b6; }
+        .status-Int3      { background: #fce7f3; color: #9d174d; }
+        .status-Rejected  { background: #fee2e2; color: #991b1b; }
+
+        /* ---- Progress bar ---- */
+        .progress-wrap { margin-top: 8px; }
+        .progress-bar-outer { height: 5px; background: #e2e8f0; border-radius: 3px; overflow: hidden; }
+        .progress-bar-inner { height: 100%; background: linear-gradient(to right, var(--primary), #60a5fa); border-radius: 3px; transition: width 0.4s; }
+        .progress-label { font-size: 10px; color: #94a3b8; margin-top: 3px; }
+
+        /* ---- Filter Chips ---- */
+        .filter-chips { display: flex; gap: 7px; flex-wrap: wrap; }
+        .chip {
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .chip:hover { background: #e2e8f0; }
+        .chip.active { background: var(--primary); color: white; }
+
+        /* ---- Editor / Preview ---- */
+        .editor-container, .preview-container {
+            background: var(--card-bg);
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.07);
+            border: 1px solid var(--border);
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 5px; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px; /* iOSズーム防止のため16px推奨 */
+            background: #fff;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+
+        /* ---- QA Items ---- */
+        .qa-item {
+            background: #f8fafc;
+            padding: 18px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            margin-bottom: 18px;
+            border-left: 5px solid var(--primary);
+            transition: border-left-color 0.3s;
+        }
+        .qa-item-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+        .char-counter { font-size: 12px; text-align: right; margin-top: 5px; color: #94a3b8; transition: color 0.2s; }
+        .char-ok { color: var(--success) !important; font-weight: 700; }
+        .char-over { color: var(--danger) !important; font-weight: 700; }
+
+        /* ---- QA Type colors ---- */
+        .type-自己PR   { border-left-color: #2563eb !important; }
+        .type-ガクチカ  { border-left-color: #16a34a !important; }
+        .type-志望動機  { border-left-color: #7c3aed !important; }
+        .type-強み弱み  { border-left-color: #ea580c !important; }
+        .type-将来像   { border-left-color: #ca8a04 !important; }
+        .type-学業・専攻 { border-left-color: #0891b2 !important; }
+        .type-趣味・特技 { border-left-color: #db2777 !important; }
+        .type-その他   { border-left-color: #64748b !important; }
+
+        .type-tag { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 10px; margin-right: 6px; }
+        .tag-自己PR   { background: #dbeafe; color: #1d4ed8; }
+        .tag-ガクチカ  { background: #dcfce7; color: #166534; }
+        .tag-志望動機  { background: #ede9fe; color: #6d28d9; }
+        .tag-強み弱み  { background: #ffedd5; color: #c2410c; }
+        .tag-将来像   { background: #fef9c3; color: #92400e; }
+        .tag-学業・専攻 { background: #cffafe; color: #0e7490; }
+        .tag-趣味・特技 { background: #fce7f3; color: #9d174d; }
+        .tag-その他   { background: #f1f5f9; color: #475569; }
+
+        /* ---- Research Table ---- */
+        .res-table, .res-view-table { width:100%; border-collapse:collapse; font-size:13px; min-width: 700px; }
+        .res-table th, .res-table td,
+        .res-view-table th, .res-view-table td { border:1px solid #dde3eb; padding:6px 8px; vertical-align:top; }
+        .res-table thead th, .res-view-table thead th { background:#f8fafc; font-weight:700; text-align:center; font-size:11px; color:#64748b; padding:9px 8px; }
+        .res-section-cell { font-weight:800; font-size:11px; text-align:center; vertical-align:middle !important; writing-mode:vertical-rl; width:24px; padding:8px 4px; }
+        .res-section-company { background:#fde8e8; color:#c53030; }
+        .res-section-self    { background:#dbeafe; color:#1d4ed8; }
+        .res-group-cell { font-weight:700; font-size:12px; color:#374151; background:#fafafa; vertical-align:middle !important; min-width:80px; padding:7px 8px; }
+        .res-item-cell  { font-size:12px; color:#4b5563; vertical-align:middle !important; min-width:100px; white-space:nowrap; padding:6px 8px; }
+        .res-input { width:100%; border:none; resize:vertical; font-size:14px; font-family:inherit; padding:6px 4px; background:transparent; min-height:34px; line-height:1.55; color:#1e293b; }
+        .res-input:focus { outline:none; background:#eff6ff; border-radius:3px; }
+        
+        .res-view-section { font-weight:800; font-size:11px; text-align:center; vertical-align:middle !important; writing-mode:vertical-rl; width:24px; padding:8px 4px; }
+        .res-view-group { font-weight:700; font-size:12px; color:#374151; background:#fafafa; vertical-align:middle !important; min-width:80px; padding:7px 8px; }
+        .res-view-item  { font-size:12px; color:#4b5563; vertical-align:middle !important; min-width:100px; white-space:nowrap; padding:6px 8px; }
+        .res-view-val   { font-size:13px; color:#1e293b; white-space:pre-wrap; line-height:1.6; min-width:140px; }
+        .res-view-memo  { font-size:12px; color:#64748b; white-space:pre-wrap; line-height:1.6; background:#fafafa; min-width:110px; }
+        .res-view-empty { color:#cbd5e1; font-style:italic; font-size:11px; }
+
+        /* ---- Search Results ---- */
+        .search-result-card { background: var(--card-bg); padding: 16px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 12px; border-left: 4px solid var(--primary); transition: box-shadow 0.2s; }
+        .search-result-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        mark.highlight { background: #fef08a; padding: 0 2px; border-radius: 2px; font-weight: 700; }
+
+        /* ---- Interview Section ---- */
+        .interview-section { background: white; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 14px; overflow: hidden; box-shadow: var(--shadow); }
+        .interview-section-header { padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: linear-gradient(to right, #faf5ff 0%, #fff 60%); border-bottom: 1px solid transparent; transition: 0.2s; }
+        .interview-section-header:hover { background: linear-gradient(to right, #f3e8ff 0%, #faf5ff 60%); }
+        .interview-section-header.open { border-bottom-color: var(--border); }
+        .interview-section-body { padding: 20px; display: none; }
+        .interview-section-body.open { display: block; animation: fadeIn 0.2s; }
+        .interview-qa-row { border-left: 3px solid var(--interview-color); padding-left: 14px; margin-bottom: 18px; padding-bottom: 4px; }
+
+        /* ---- Modals ---- */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 5000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; border-radius: 16px; padding: 28px; max-width: 700px; width: 93%; max-height: 88vh; overflow-y: auto; box-shadow: 0 25px 60px rgba(0,0,0,0.3); animation: fadeIn 0.25s; }
+        .modal-box h3 { margin: 0 0 12px; font-size: 17px; }
+        .modal-prompt-area { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 16px; font-size: 12.5px; line-height: 1.85; white-space: pre-wrap; word-break: break-all; max-height: 340px; overflow-y: auto; font-family: "SF Mono", "Fira Code", monospace; }
+        .other-answer-item { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 10px; transition: 0.2s; }
+        .other-answer-item:hover { border-color: var(--primary); background: #eff6ff; }
+
+        /* ---- Proof Image ---- */
+        .proof-img-container { margin-top: 8px; position: relative; display: inline-block; }
+        .proof-img-preview { max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid var(--border); cursor: pointer; }
+        .proof-img-full { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:2000; justify-content:center; align-items:center; }
+        .proof-img-full.active { display: flex; }
+
+        /* ---- Calendar ---- */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+        .cal-day { background: white; border-radius: 8px; min-height: 90px; padding: 8px; border: 1px solid var(--border); font-size: 11px; }
+        .cal-today { border: 2px solid var(--primary); background: #eff6ff; }
+        .cal-day-label { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+
+        /* ---- OCR Loading & Toast ---- */
+        #ocrLoading { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.92); z-index: 3000; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+        #toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: white; padding: 12px 22px; border-radius: 10px; font-size: 14px; font-weight: 700; z-index: 9999; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; pointer-events: none; }
+        #toast.show { transform: translateY(0); opacity: 1; }
+
+        /* ---- Details/Summary ---- */
+        details { margin-bottom: 14px; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; background: #fafbfc; }
+        summary { cursor: pointer; font-weight: 700; font-size: 14px; user-select: none; }
+        details[open] summary { margin-bottom: 12px; }
+
+        /* =========================================
+           📱 MOBILE & TABLET OPTIMIZATION
+           ========================================= */
+        @media (max-width: 768px) {
+            body { padding: 12px 10px; }
+            .editor-container, .preview-container { padding: 16px; }
+            .btn { padding: 12px 16px; min-height: 44px; font-size: 14px; }
+            .btn-sm, .btn-xs { min-height: 38px; padding: 8px 12px; }
+            input, select, textarea { font-size: 16px !important; padding: 14px 12px; }
+            header { flex-direction: column; align-items: stretch; gap: 12px; padding-bottom: 10px; }
+            #mainActions button { width: 100%; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .form-row { grid-template-columns: 1fr; gap: 12px; }
+            .es-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            
+            .es-card > div:last-child { display: grid !important; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .es-card > div:last-child button, .es-card > div:last-child a { width: 100%; margin: 0 !important; text-align: center; justify-content: center; }
+            
+            #companyList > div:first-child { flex-direction: column; align-items: stretch; gap: 12px; }
+            #companyList > div:first-child > div { width: 100%; justify-content: flex-start; }
+            #companyList > div:first-child > div:last-child { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+            #companyList > div:first-child > div:last-child label { margin: 0; display: flex; align-items: center; justify-content: center; width: 100%; }
+            
+            .qa-item-toolbar { flex-direction: column; align-items: stretch !important; gap: 10px; }
+            .qa-item-toolbar > div { width: 100%; justify-content: space-between; gap: 8px; }
+            .qa-item-toolbar select { flex: 1; min-height: 44px; }
+            .qa-item-toolbar > div:nth-child(2) { display: grid !important; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .qa-item-toolbar > div:nth-child(2) button { width: 100%; margin: 0 !important; }
+            input[type="number"].qa-limit, input[type="number"].tmpl-limit { width: 80px !important; font-size: 16px !important; }
+            
+            .res-input { font-size: 16px !important; }
+            details[id^="companyResearchDetails"] > div, details[id^="researchDetails"] > div { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+            #eventListContainer .event-item { flex-direction: column; align-items: stretch !important; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid var(--border); gap: 8px !important; }
+            #eventListContainer .event-item input, #eventListContainer .event-item button { width: 100% !important; margin: 0; }
+
+            .modal-box { padding: 20px 15px; width: 95%; max-height: 85vh; }
+            .modal-box > div:last-child { flex-direction: column; gap: 10px; }
+            .modal-box > div:last-child button { width: 100%; margin: 0; }
+            
+            .preview-container > div:first-child { flex-direction: column; align-items: stretch; gap: 12px; }
+            .preview-container > div:first-child > div { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+            .preview-container > div:first-child > div button { width: 100%; }
+            
+            .search-result-card > div:first-child { flex-direction: column; align-items: stretch; }
+            .search-result-card > div:first-child > div:last-child { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+            .search-result-card > div:first-child > div:last-child button { width: 100%; justify-content: center; }
+
+            #calendarView > div:first-child > div { flex-direction: column; gap: 10px; }
+            #calendarView > div:first-child > div button { width: 100%; }
+            .calendar-grid { gap: 4px; }
+            .cal-day { min-height: 70px; padding: 4px; font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== OVERLAYS ========== -->
+<div id="ocrLoading">
+    <div style="font-weight:800; font-size:18px; color:var(--primary);">🔍 AI文字起こし処理中...</div>
+    <progress id="ocrProgress" max="100" value="0" style="width:220px;"></progress>
+    <div style="font-size:13px; color:#64748b;">しばらくお待ちください</div>
+</div>
+
+<div id="fullImageOverlay" class="proof-img-full" onclick="this.classList.remove('active')">
+    <img id="fullImage" src="" style="max-width:92%; max-height:92%; border-radius:8px;">
+</div>
+
+<!-- AI Prompt Modal -->
+<div id="aiPromptModal" class="modal-overlay" onclick="if(event.target===this)closeAiModal()">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+            <div>
+                <h3 id="aiModalTitle" style="margin:0; color:var(--interview-color);">🤖 AIプロンプト</h3>
+                <p style="margin:6px 0 0; font-size:12px; color:#64748b;">ChatGPT・Claude等にコピー＆ペーストして使ってください</p>
+            </div>
+            <button onclick="closeAiModal()" class="btn btn-secondary btn-sm">✕</button>
+        </div>
+        <div id="aiPromptText" class="modal-prompt-area"></div>
+        <div style="margin-top:14px; display:flex; gap:10px; justify-content:flex-end;">
+            <button onclick="closeAiModal()" class="btn btn-secondary">閉じる</button>
+            <button onclick="copyAiPrompt()" class="btn btn-primary">📋 プロンプトをコピー</button>
+        </div>
+    </div>
+</div>
+
+<!-- Other Answers Modal -->
+<div id="otherAnswersModal" class="modal-overlay" onclick="if(event.target===this)closeOtherModal()">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h3 id="otherAnswersTitle" style="margin:0; color:var(--primary);">📚 他社の回答を参照</h3>
+            <button onclick="closeOtherModal()" class="btn btn-secondary btn-sm">✕</button>
+        </div>
+        <p style="font-size:12px; color:#64748b; margin:0 0 14px;">クリックで回答をプレビュー。「流用する」を押すと現在の欄に反映されます。</p>
+        <div id="otherAnswersList"></div>
+    </div>
+</div>
+
+<!-- Template Paste Modal -->
+<div id="templatePasteModal" class="modal-overlay" onclick="if(event.target===this)closeTemplateModal()">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h3 style="margin:0; color:#0891b2;">📋 ESテンプレから設問を追加</h3>
+            <button onclick="closeTemplateModal()" class="btn btn-secondary btn-sm">✕</button>
+        </div>
+        <p style="font-size:12px; color:#64748b; margin:0 0 14px;">追加したい設問の「＋追加」を押すと、現在の編集画面に設問が追加されます。</p>
+        <div id="templatePasteList"></div>
+    </div>
+</div>
+
+<!-- Template Editor Modal -->
+<div id="templateEditorModal" class="modal-overlay" onclick="if(event.target===this)closeTemplateEditor()">
+    <div class="modal-box" style="max-width:800px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="margin:0; color:#0891b2;">📋 ESテンプレ編集</h3>
+            <div style="display:flex; gap:8px;">
+                <button onclick="addTemplateQaRow({})" class="btn btn-sm btn-secondary">＋ 設問</button>
+                <button onclick="saveTemplateEditor()" class="btn btn-sm btn-primary">💾 保存</button>
+                <button onclick="closeTemplateEditor()" class="btn btn-secondary btn-sm">✕</button>
+            </div>
+        </div>
+        <p style="font-size:12px; color:#64748b; margin:0 0 16px;">共通の設問・文字数制限を登録しておくと、各案件の編集画面「テンプレから追加」でペーストできます。</p>
+        <div style="background:#f0fdf4; border:1.5px solid #bbf7d0; border-radius:10px; padding:14px; margin-bottom:18px;">
+            <label style="font-size:12px; font-weight:700; color:#166534; text-transform:uppercase; letter-spacing:0.04em; margin-bottom:6px; display:block;">📝 テンプレメモ（自己分析・背景など）</label>
+            <textarea id="templateMemoInput" rows="5" style="width:100%; padding:10px 12px; border:1.5px solid #86efac; border-radius:8px; font-size:16px; line-height:1.7; font-family:inherit; resize:vertical; background:#fff;" placeholder="例：
+・強み：課題発見力と粘り強さ
+・ガクチカのエピソード：テニスサークル運営
+・志望軸：社会インフラに携わりたい
+"></textarea>
+        </div>
+        <div id="templateQaList"></div>
+        <div style="text-align:center; padding:14px; border:2px dashed #a5f3fc; border-radius:10px; margin-top:4px;">
+            <button onclick="addTemplateQaRow({})" class="btn btn-sm" style="background:#cffafe; color:#0e7490; border:1px solid #67e8f9;">＋ 設問を追加</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cue Card Overlay -->
+<div id="cueCardOverlay" style="display:none; position:fixed; inset:0; background:#0f172a; z-index:8000; flex-direction:column; overflow:hidden;">
+    <div id="cueHeader" style="background:#1e293b; padding:10px 16px; display:flex; align-items:center; gap:10px; flex-shrink:0; border-bottom:2px solid #334155; flex-wrap:wrap;">
+        <span style="font-size:17px;">📺</span>
+        <span id="cueCompanyName" style="font-size:15px; font-weight:800; color:#e2e8f0;"></span>
+        <span id="cueStatusBadge" class="status-badge" style="flex-shrink:0;"></span>
+        <div style="display:flex; gap:5px; margin-left:auto;">
+            <button onclick="cueChangeFontSize(-2)" style="background:#334155; color:#94a3b8; border:none; border-radius:6px; padding:5px 9px; cursor:pointer; font-weight:700; font-size:13px;">A−</button>
+            <button onclick="cueChangeFontSize(2)"  style="background:#334155; color:#94a3b8; border:none; border-radius:6px; padding:5px 9px; cursor:pointer; font-weight:700; font-size:13px;">A+</button>
+        </div>
+        <span id="cueProgressLabel" style="font-size:12px; color:#94a3b8; white-space:nowrap;"></span>
+        <button onclick="closeCueCard()" style="background:#7f1d1d; color:#fca5a5; border:none; border-radius:8px; padding:8px 16px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap;">✕ 終了</button>
+    </div>
+    <div id="cueBody" style="flex:1; overflow-y:auto; padding:24px 28px;"></div>
+    <div id="cueResearchStrip" style="display:none; background:#1e293b; padding:10px 18px; flex-shrink:0; border-top:1px solid #334155; gap:20px; flex-wrap:wrap;"></div>
+    <div style="background:#1e293b; padding:12px 18px; flex-shrink:0; display:flex; align-items:center; gap:10px; border-top:1px solid #334155;">
+        <button id="cuePrevBtn" onclick="cueMoveStep(-1)" style="background:#334155; color:#e2e8f0; border:none; border-radius:8px; padding:10px 20px; font-size:15px; font-weight:700; cursor:pointer;">◀ 前</button>
+        <div id="cueDots" style="display:flex; gap:7px; flex:1; justify-content:center; flex-wrap:wrap;"></div>
+        <button id="cueNextBtn" onclick="cueMoveStep(1)"  style="background:#334155; color:#e2e8f0; border:none; border-radius:8px; padding:10px 20px; font-size:15px; font-weight:700; cursor:pointer;">次 ▶</button>
+    </div>
+</div>
+
+<!-- Episode Editor Modal -->
+<div id="episodeEditorModal" class="modal-overlay" onclick="if(event.target===this)closeEpisodeEditor()">
+    <div class="modal-box" style="max-width:780px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+            <h3 id="episodeEditorTitle" style="margin:0; color:#c2410c;">💼 エピソード追加</h3>
+            <div style="display:flex; gap:8px;">
+                <button onclick="saveEpisode()" class="btn btn-sm btn-primary">💾 保存</button>
+                <button onclick="closeEpisodeEditor()" class="btn btn-secondary btn-sm">✕</button>
+            </div>
+        </div>
+
+        <!-- タイトル・カテゴリ・重要度 -->
+        <div style="display:grid; grid-template-columns:1fr auto auto; gap:10px; margin-bottom:14px; align-items:end;">
+            <div>
+                <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">エピソードタイトル ＊</label>
+                <input id="epTitle" type="text" placeholder="例：テニスサークルの幹事として部員数を倍増させた話" style="width:100%; padding:10px 12px; border:1.5px solid #fed7aa; border-radius:8px; font-size:14px; font-family:inherit;">
+            </div>
+            <div>
+                <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">カテゴリ</label>
+                <select id="epCategory" style="padding:10px 12px; border:1.5px solid #fed7aa; border-radius:8px; font-size:14px; font-weight:700; background:#fff; font-family:inherit;">
+                    <option value="ガクチカ">ガクチカ</option>
+                    <option value="自己PR">自己PR・強み</option>
+                    <option value="困難克服">困難克服</option>
+                    <option value="リーダーシップ">リーダーシップ</option>
+                    <option value="チームワーク">チームワーク</option>
+                    <option value="失敗・挫折">失敗・挫折</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">⭐ 重要度</label>
+                <select id="epStar" style="padding:10px 12px; border:1.5px solid #fed7aa; border-radius:8px; font-size:14px; font-weight:700; background:#fff; font-family:inherit;">
+                    <option value="3">⭐⭐⭐ 主力</option>
+                    <option value="2">⭐⭐ サブ</option>
+                    <option value="1">⭐ 補助</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- STAR法フォーム -->
+        <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:10px; padding:14px; margin-bottom:12px;">
+            <div style="font-size:11px; font-weight:800; color:#c2410c; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.06em;">STAR法で整理</div>
+            <div style="display:grid; gap:10px;">
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:#92400e; display:block; margin-bottom:4px;">🌍 Situation — 状況・背景（いつ・どこで・何のため）</label>
+                    <textarea id="epSituation" rows="2" placeholder="例：大学2年から3年にかけて、50人規模のテニスサークルの副幹事を務めた。入部者が年々減少し、存続が危ぶまれていた。" style="width:100%; padding:9px 12px; border:1.5px solid #fdba74; border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fff;"></textarea>
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:#92400e; display:block; margin-bottom:4px;">🎯 Task — 課題・目標（自分に与えられた役割・何を達成すべきか）</label>
+                    <textarea id="epTask" rows="2" placeholder="例：新入生勧誘数を前年比150%にし、サークルの財政基盤を安定させることを目標とした。" style="width:100%; padding:9px 12px; border:1.5px solid #fdba74; border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fff;"></textarea>
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:#92400e; display:block; margin-bottom:4px;">⚡ Action — 行動（自分が具体的に取った行動・工夫・なぜその行動をとったか）</label>
+                    <textarea id="epAction" rows="3" placeholder="例：①SNS運用を刷新しInstagram投稿を週3回に増加。②体験入部の参加ハードルを下げるため無料体験を月2回設定。③OBとの交流会を企画し先輩から勧誘協力を得た。" style="width:100%; padding:9px 12px; border:1.5px solid #fdba74; border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fff;"></textarea>
+                </div>
+                <div>
+                    <label style="font-size:12px; font-weight:700; color:#92400e; display:block; margin-bottom:4px;">🏆 Result — 結果・成果（数値があれば必ず入れる）</label>
+                    <textarea id="epResult" rows="2" placeholder="例：新入部員が前年の12名から27名（+125%）に増加。サークル年間収支が初めて黒字（+8万円）となった。" style="width:100%; padding:9px 12px; border:1.5px solid #fdba74; border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fff;"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- 学び・自由メモ -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div>
+                <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">💡 学び・得たスキル（仕事への活かし方も）</label>
+                <textarea id="epLearning" rows="3" placeholder="例：数字でKPIを設定し、施策を逐次改善するPDCAの重要性を学んだ。課題発見力と実行力を仕事でも活かしたい。" style="width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fff;"></textarea>
+            </div>
+            <div>
+                <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">🏷️ 活用できる設問タイプ（複数可）</label>
+                <div id="epUsableTags" style="display:flex; flex-wrap:wrap; gap:6px; padding:8px; border:1.5px solid var(--border); border-radius:8px; background:#fff; min-height:60px;">
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;"><input type="checkbox" value="自己PR"> 自己PR</label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;"><input type="checkbox" value="ガクチカ"> ガクチカ</label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;"><input type="checkbox" value="志望動機"> 志望動機</label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;"><input type="checkbox" value="強み弱み"> 強み・弱み</label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;"><input type="checkbox" value="将来像"> 将来像</label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;"><input type="checkbox" value="困難克服"> 困難克服</label>
+                    <label style="display:flex; align-items:center; gap:4px; font-size:12px; cursor:pointer;"><input type="checkbox" value="その他"> その他</label>
+                </div>
+            </div>
+        </div>
+        <div>
+            <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">📝 自由メモ（面接での補足・深掘り想定QAなど）</label>
+            <textarea id="epMemo" rows="2" placeholder="例：面接で「なぜSNS?」と聞かれた場合→競合サークルの調査でInstagram経由の認知が最多だったため。" style="width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fff;"></textarea>
+        </div>
+        <input type="hidden" id="epEditingId">
+    </div>
+</div>
+
+<!-- Interview QA Editor Modal -->
+<div id="iqEditorModal" class="modal-overlay" onclick="if(event.target===this)closeIqEditor()">
+    <div class="modal-box" style="max-width:720px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 id="iqEditorTitle" style="margin:0; color:#4f46e5;">🗂 Q&A 追加</h3>
+            <div style="display:flex; gap:8px;">
+                <button onclick="saveIq()" class="btn btn-sm btn-primary">💾 保存</button>
+                <button onclick="closeIqEditor()" class="btn btn-secondary btn-sm">✕</button>
+            </div>
+        </div>
+
+        <!-- カテゴリ・難易度 -->
+        <div style="display:grid; grid-template-columns:1fr auto auto; gap:10px; margin-bottom:14px; align-items:end;">
+            <div>
+                <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">カテゴリ</label>
+                <select id="iqCategory" style="width:100%; padding:10px 12px; border:1.5px solid #c7d2fe; border-radius:8px; font-size:14px; font-weight:700; background:#fff; font-family:inherit;">
+                    <option value="自己紹介">自己紹介</option>
+                    <option value="ガクチカ深掘り">ガクチカ深掘り</option>
+                    <option value="自己PR深掘り">自己PR深掘り</option>
+                    <option value="志望動機深掘り">志望動機深掘り</option>
+                    <option value="強み・弱み">強み・弱み</option>
+                    <option value="将来像">将来像</option>
+                    <option value="逆質問">逆質問</option>
+                    <option value="その他">その他</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">難易度</label>
+                <select id="iqDifficulty" style="padding:10px 12px; border:1.5px solid #c7d2fe; border-radius:8px; font-size:14px; font-weight:700; background:#fff; font-family:inherit;">
+                    <option value="3">🔴 難しい</option>
+                    <option value="2" selected>🟡 普通</option>
+                    <option value="1">🟢 簡単</option>
+                </select>
+            </div>
+            <div>
+                <label style="font-size:11px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">習熟度</label>
+                <select id="iqMastery" style="padding:10px 12px; border:1.5px solid #c7d2fe; border-radius:8px; font-size:14px; font-weight:700; background:#fff; font-family:inherit;">
+                    <option value="0">❓ 未対策</option>
+                    <option value="1">📝 対策中</option>
+                    <option value="2">✅ 完璧</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 質問 -->
+        <div style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:700; color:#4f46e5; display:block; margin-bottom:4px;">❓ 面接で聞かれる質問 ＊</label>
+            <textarea id="iqQuestion" rows="2" placeholder="例：学生時代に最も力を入れたことを教えてください。その中で困ったことはありましたか？"
+                style="width:100%; padding:10px 12px; border:2px solid #c7d2fe; border-radius:8px; font-size:14px; font-family:inherit; resize:vertical; background:#f5f3ff;"></textarea>
+        </div>
+
+        <!-- 回答 -->
+        <div style="margin-bottom:12px;">
+            <label style="font-size:12px; font-weight:700; color:#059669; display:block; margin-bottom:4px;">✅ 自分の回答（どう返すか）</label>
+            <textarea id="iqAnswer" rows="5" placeholder="例：はい、テニスサークルの副幹事として〇〇に力を入れました。具体的には…（結論→エピソード→学びの順で話す）"
+                style="width:100%; padding:10px 12px; border:2px solid #a7f3d0; border-radius:8px; font-size:14px; font-family:inherit; resize:vertical; background:#f0fdf4;"></textarea>
+        </div>
+
+        <!-- ポイント・注意点 -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+            <div>
+                <label style="font-size:12px; font-weight:700; color:#d97706; display:block; margin-bottom:4px;">⚡ 回答のポイント・構成メモ</label>
+                <textarea id="iqPoints" rows="3" placeholder="例：・結論ファースト&#10;・数字を入れる（+125%）&#10;・30秒で言い切る"
+                    style="width:100%; padding:9px 12px; border:1.5px solid #fde68a; border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fffbeb;"></textarea>
+            </div>
+            <div>
+                <label style="font-size:12px; font-weight:700; color:#dc2626; display:block; margin-bottom:4px;">⚠️ 注意点・避けるべき表現</label>
+                <textarea id="iqCaution" rows="3" placeholder="例：・「〜と思います」を多用しない&#10;・ネガティブで終わらない&#10;・会社名を間違えない"
+                    style="width:100%; padding:9px 12px; border:1.5px solid #fecaca; border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fff5f5;"></textarea>
+            </div>
+        </div>
+
+        <!-- 実際に聞かれた記録 -->
+        <div>
+            <label style="font-size:12px; font-weight:700; color:#64748b; display:block; margin-bottom:4px;">📌 実際に聞かれた企業・日付・感触</label>
+            <textarea id="iqRecord" rows="2" placeholder="例：○○社 1次面接（2025/2/10）→ 深掘りされた。次回は数字をもっと具体的に。△△社（2/15）→ 好感触"
+                style="width:100%; padding:9px 12px; border:1.5px solid var(--border); border-radius:8px; font-size:13px; font-family:inherit; resize:vertical; background:#fff;"></textarea>
+        </div>
+        <input type="hidden" id="iqEditingId">
+    </div>
+</div>
+
+<!-- Mobile Transfer Modal -->
+<div id="mobileTransferModal" class="modal-overlay" onclick="if(event.target===this)closeMobileTransfer()">
+    <div class="modal-box" style="max-width:680px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <div>
+                <h3 style="margin:0; color:#0284c7;">📱 スマホ・タブレット転送</h3>
+                <p style="margin:4px 0 0; font-size:12px; color:#64748b;">ファイル不要・テキストをコピペするだけでデータを移行できます</p>
+            </div>
+            <button onclick="closeMobileTransfer()" class="btn btn-secondary btn-sm">✕</button>
+        </div>
+
+        <!-- タブ -->
+        <div style="display:flex; border-bottom:2px solid #e2e8f0; margin-bottom:18px; gap:0;">
+            <button id="mtTabExport" onclick="switchMtTab('export')"
+                style="padding:10px 20px; border:none; font-size:13px; font-weight:700; cursor:pointer; border-bottom:3px solid #0284c7; color:#0284c7; background:transparent; margin-bottom:-2px;">
+                📤 このデバイスからエクスポート
+            </button>
+            <button id="mtTabImport" onclick="switchMtTab('import')"
+                style="padding:10px 20px; border:none; font-size:13px; font-weight:700; cursor:pointer; border-bottom:3px solid transparent; color:#64748b; background:transparent; margin-bottom:-2px;">
+                📥 テキストからインポート
+            </button>
+        </div>
+
+        <!-- エクスポートパネル -->
+        <div id="mtPanelExport">
+            <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:10px; padding:14px; margin-bottom:14px;">
+                <p style="margin:0 0 8px; font-size:13px; color:#0369a1; font-weight:700;">📋 手順</p>
+                <ol style="margin:0; padding-left:18px; font-size:13px; color:#374151; line-height:1.9;">
+                    <li>下の「全選択してコピー」を押す</li>
+                    <li>スマホのメモ帳・LINEのメモ等に貼り付けて保存</li>
+                    <li>スマホで ES Manager Pro を開いて「スマホ転送 → インポート」から貼り付ける</li>
+                </ol>
+            </div>
+            <div style="display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap;">
+                <button onclick="mtSelectAll()" class="btn btn-sm" style="background:#0284c7; color:white; border:none;">📋 全選択してコピー</button>
+                <span id="mtCopyFeedback" style="font-size:13px; color:#22c55e; font-weight:700; align-self:center; display:none;">✅ コピーしました！</span>
+            </div>
+            <textarea id="mtExportText" readonly
+                style="width:100%; height:220px; font-family:monospace; font-size:11px; padding:10px; border:1.5px solid #bae6fd; border-radius:8px; background:#f8fafc; color:#374151; resize:none; line-height:1.5;"
+                placeholder="データを読み込み中…"></textarea>
+            <p style="font-size:11px; color:#94a3b8; margin:6px 0 0;">※ このテキスト全体がバックアップデータです。一部でも欠けると読み込めません。</p>
+        </div>
+
+        <!-- インポートパネル -->
+        <div id="mtPanelImport" style="display:none;">
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px; margin-bottom:14px;">
+                <p style="margin:0 0 8px; font-size:13px; color:#166534; font-weight:700;">📋 手順</p>
+                <ol style="margin:0; padding-left:18px; font-size:13px; color:#374151; line-height:1.9;">
+                    <li>PCやメモ帳に保存しておいたバックアップテキストをコピー</li>
+                    <li>下のテキストエリアを長押し →「貼り付け」を選択</li>
+                    <li>「読み込む」ボタンを押す</li>
+                </ol>
+            </div>
+            <label style="font-size:12px; font-weight:700; color:#166534; display:block; margin-bottom:6px;">バックアップテキストをここに貼り付け</label>
+            <textarea id="mtImportText"
+                style="width:100%; height:200px; font-family:monospace; font-size:11px; padding:10px; border:2px solid #86efac; border-radius:8px; background:#fff; color:#374151; resize:vertical; line-height:1.5;"
+                placeholder="ここにバックアップテキストを貼り付けてください…"></textarea>
+            <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; align-items:center;">
+                <button onclick="mtImportFromText()" class="btn btn-primary" style="background:#16a34a; border:none;">📥 読み込む</button>
+                <button onclick="document.getElementById('mtImportText').value=''" class="btn btn-sm btn-secondary">クリア</button>
+                <span id="mtImportStatus" style="font-size:12px; color:#64748b;"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ========== MAIN ========== -->
+<div class="container">
+    <header>
+        <h1>🚀 ES Manager Pro
+            <span style="font-size:12px; font-weight:600; background:#e0e7ff; color:#4338ca; padding:3px 9px; border-radius:6px;">v10</span>
+        </h1>
+        <div id="mainActions">
+            <button id="createBtn" class="btn btn-primary">＋ 新規案件</button>
+        </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-grid" id="statsDashboard">
+        <div class="stat-card"><div class="stat-value" id="stat-total">0</div><div class="stat-label">総応募数</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-submitted">0</div><div class="stat-label">提出済み</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-pass">–</div><div class="stat-label">ES通過数</div></div>
+        <div class="stat-card"><div class="stat-value" id="stat-urgent" style="color:var(--danger); font-size:18px;">–</div><div class="stat-label">次の締切</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" id="tabNav">
+        <button class="tab-btn active" data-tab="companyList"   onclick="switchTab('companyList')">🏢 案件リスト</button>
+        <button class="tab-btn"        data-tab="calendarView"  onclick="switchTab('calendarView')">📅 カレンダー</button>
+        <button class="tab-btn"        data-tab="qaSearch"      onclick="switchTab('qaSearch')">🔍 回答DB</button>
+        <button class="tab-btn"        data-tab="researchView"  onclick="switchTab('researchView')">🔬 企業研究</button>
+        <button class="tab-btn"        data-tab="episodeBank"   onclick="switchTab('episodeBank')">💼 自己分析</button>
+        <button class="tab-btn"        data-tab="interviewView" onclick="switchTab('interviewView')">💬 面接対策</button>
+    </div>
+
+    <!-- ===== 案件リスト ===== -->
+    <div id="companyList" class="view-section active">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+            <div class="filter-chips" id="statusFilter">
+                <button class="chip active" onclick="setStatusFilter('all',this)">すべて</button>
+                <button class="chip" onclick="setStatusFilter('Draft',this)">下書き</button>
+                <button class="chip" onclick="setStatusFilter('Submitted',this)">提出済み</button>
+                <button class="chip" onclick="setStatusFilter('Passed',this)">ES通過</button>
+                <button class="chip" onclick="setStatusFilter('Int1',this)">1次通過</button>
+                <button class="chip" onclick="setStatusFilter('Int2',this)">2次通過</button>
+                <button class="chip" onclick="setStatusFilter('Int3',this)">3次通過</button>
+                <button class="chip" onclick="setStatusFilter('Rejected',this)">お祈り</button>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button onclick="downloadData()" class="btn btn-sm btn-secondary">💾 バックアップ</button>
+                <label class="btn btn-sm btn-secondary" style="cursor:pointer; margin:0; display:flex; justify-content:center; align-items:center;">
+                    📂 インポート
+                    <input type="file" id="importFileInput" onchange="importData(this)" style="display:none;">
+                </label>
+                <button onclick="openMobileTransfer()" class="btn btn-sm" style="background:linear-gradient(135deg,#0ea5e9,#0284c7); color:white; border:none;">📱 スマホ転送</button>
+            </div>
+        </div>
+        <div id="esListContainer"></div>
+        <div id="emptyMessage" style="text-align:center; color:#9ca3af; padding:50px; display:none;">
+            <div style="font-size:48px; margin-bottom:12px;">📂</div>
+            <p style="font-size:16px;">管理中の案件がありません。「新規案件」から始めましょう！</p>
+        </div>
+    </div>
+
+    <!-- ===== プレビュー ===== -->
+    <div id="previewView" class="view-section">
+        <div class="preview-container">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:10px;">
+                <h2 id="previewCompanyName" style="margin:0;"></h2>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button onclick="copyForAI()" class="btn btn-ai">🤖 ES添削プロンプト</button>
+                    <button onclick="editFromPreview()" class="btn btn-primary">✏️ 編集</button>
+                    <button onclick="switchTab('companyList')" class="btn btn-secondary">← 戻る</button>
+                </div>
+            </div>
+            <div id="previewContent"></div>
+        </div>
+    </div>
+
+    <!-- ===== 編集画面 ===== -->
+    <div id="editorView" class="view-section">
+        <div class="editor-container">
+            <div style="display:flex; justify-content:space-between; margin-bottom:22px; align-items:center;">
+                <h2 id="editorTitle" style="margin:0;">案件編集</h2>
+                <div style="display:flex; gap:10px;">
+                    <button id="cancelBtn" class="btn btn-secondary">中止</button>
+                    <button id="saveBtn" class="btn btn-primary" style="padding:10px 28px;">💾 保存</button>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>企業名 <span style="color:var(--danger)">*</span></label>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="companyInput" placeholder="株式会社〇〇">
+                        <button id="starBtn" class="btn btn-secondary" onclick="toggleStar()" style="min-width:50px;"><span id="starIcon">☆</span></button>
+                    </div>
+                </div>
+                <div>
+                    <label>ステータス</label>
+                    <select id="statusInput">
+                        <option value="Draft">下書き中</option>
+                        <option value="Submitted">提出済み</option>
+                        <option value="Passed">ES通過 🎉</option>
+                        <option value="Int1">1次面接通過 ✨</option>
+                        <option value="Int2">2次面接通過 ✨</option>
+                        <option value="Int3">3次面接通過 ✨</option>
+                        <option value="Rejected">お祈り</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div>
+                    <label>ES提出期限</label>
+                    <div style="display:flex; gap:6px;">
+                        <input type="date" id="deadlineInput">
+                        <button onclick="addToGoogle('deadline')" class="btn btn-google btn-sm">G登録</button>
+                    </div>
+                </div>
+                <div>
+                    <label>提出証明スクリーンショット</label>
+                    <input type="file" id="proofImgInput" accept="image/*" style="font-size:14px !important;">
+                    <div id="proofImgPreviewArea" class="proof-img-container"></div>
+                </div>
+            </div>
+
+            <details id="researchDetails">
+                <summary>🌐 マイページ・ログイン情報</summary>
+                <div style="padding-top:8px;">
+                    <label>マイページURL</label>
+                    <input type="url" id="myPageUrlInput" placeholder="https://..." style="margin-bottom:12px;">
+                    <div class="form-row">
+                        <div><label>ログインID</label><input type="text" id="myPageIdInput"></div>
+                        <div><label>パスワード</label><input type="text" id="myPagePassInput"></div>
+                    </div>
+                </div>
+            </details>
+
+            <details id="companyResearchDetails" style="margin-top:10px;">
+                <summary>🔬 企業研究メモ</summary>
+                <div style="padding-top:12px;">
+                <table class="res-table">
+                    <colgroup><col style="width:24px"><col style="width:90px"><col style="width:110px"><col><col style="width:30%"></colgroup>
+                    <thead><tr><th colspan="3" style="border:none; background:transparent;"></th><th>リサーチ結果</th><th>メモ</th></tr></thead>
+                    <tbody>
+                    <!-- 企業の情報 -->
+                    <tr>
+                        <td class="res-section-cell res-section-company" rowspan="12">企業の情報</td>
+                        <td class="res-group-cell" rowspan="3">基本情報</td>
+                        <td class="res-item-cell">設立年度</td>
+                        <td><textarea class="res-input" id="res_founded" rows="1" placeholder="例：1985年"></textarea></td>
+                        <td><textarea class="res-input" id="res_founded_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">資本金</td>
+                        <td><textarea class="res-input" id="res_capital" rows="1" placeholder="例：50億円"></textarea></td>
+                        <td><textarea class="res-input" id="res_capital_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">従業員数</td>
+                        <td><textarea class="res-input" id="res_employees" rows="1" placeholder="例：3,000名（連結）"></textarea></td>
+                        <td><textarea class="res-input" id="res_employees_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-group-cell res-item-cell" colspan="2">企業理念</td>
+                        <td><textarea class="res-input" id="res_vision" rows="2" placeholder="例：「〇〇で世界を変える」。2030年に売上1兆円目標。"></textarea></td>
+                        <td><textarea class="res-input" id="res_vision_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-group-cell res-item-cell" colspan="2">事業内容</td>
+                        <td><textarea class="res-input" id="res_business" rows="2" placeholder="例：BtoBのSaaS、主力は〇〇管理システム。売上の70%を占める。"></textarea></td>
+                        <td><textarea class="res-input" id="res_business_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-group-cell" rowspan="2">競合他社との比較</td>
+                        <td class="res-item-cell">強み</td>
+                        <td><textarea class="res-input" id="res_strengths" rows="2" placeholder="例：独自技術〇〇、業界唯一のワンストップサービス。"></textarea></td>
+                        <td><textarea class="res-input" id="res_strengths_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">弱み</td>
+                        <td><textarea class="res-input" id="res_weaknesses" rows="2" placeholder="例：海外展開が遅れている、特定顧客依存度が高い。"></textarea></td>
+                        <td><textarea class="res-input" id="res_weaknesses_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-group-cell" rowspan="5">労働条件</td>
+                        <td class="res-item-cell">給与</td>
+                        <td><textarea class="res-input" id="res_salary" rows="1" placeholder="例：月給22万〜、平均年収650万円"></textarea></td>
+                        <td><textarea class="res-input" id="res_salary_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">昇給</td>
+                        <td><textarea class="res-input" id="res_salaryInc" rows="1" placeholder="例：年1回、平均3%"></textarea></td>
+                        <td><textarea class="res-input" id="res_salaryInc_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">勤務地</td>
+                        <td><textarea class="res-input" id="res_location" rows="1" placeholder="例：東京本社・大阪支社、転勤あり"></textarea></td>
+                        <td><textarea class="res-input" id="res_location_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">勤務時間</td>
+                        <td><textarea class="res-input" id="res_workHours" rows="1" placeholder="例：フレックス、コアタイム10〜15時、平均残業20h"></textarea></td>
+                        <td><textarea class="res-input" id="res_workHours_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">休暇・休日</td>
+                        <td><textarea class="res-input" id="res_vacation" rows="1" placeholder="例：完全週休2日、有休平均取得12日、育休取得率90%"></textarea></td>
+                        <td><textarea class="res-input" id="res_vacation_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <!-- 自分の情報 -->
+                    <tr>
+                        <td class="res-section-cell res-section-self" rowspan="9">自分の情報</td>
+                        <td class="res-group-cell res-item-cell" colspan="2">志望理由</td>
+                        <td><textarea class="res-input" id="res_why" rows="3" placeholder="例：競合A社より〇〇の点で優れている。自分の強みである〇〇を活かせる環境だと感じた理由は…"></textarea></td>
+                        <td><textarea class="res-input" id="res_why_m" rows="3" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-group-cell res-item-cell" colspan="2">志望部署</td>
+                        <td><textarea class="res-input" id="res_targetDept" rows="1" placeholder="例：営業推進部、DX推進室"></textarea></td>
+                        <td><textarea class="res-input" id="res_targetDept_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-group-cell" rowspan="4">アピールポイント</td>
+                        <td class="res-item-cell">求める人物像と重なる部分</td>
+                        <td><textarea class="res-input" id="res_philosophy" rows="2" placeholder="例：チャレンジ精神旺盛、チームワーク重視 → 自分の〇〇と一致"></textarea></td>
+                        <td><textarea class="res-input" id="res_philosophy_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">生かせる長所</td>
+                        <td><textarea class="res-input" id="res_appealStr" rows="2" placeholder="例：課題発見力、粘り強さ、チームリーダー経験"></textarea></td>
+                        <td><textarea class="res-input" id="res_appealStr_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">理念への共感</td>
+                        <td><textarea class="res-input" id="res_appealVision" rows="2" placeholder="例：〇〇で社会を変えるという理念に共感。自分の原体験として…"></textarea></td>
+                        <td><textarea class="res-input" id="res_appealVision_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">事業への共感</td>
+                        <td><textarea class="res-input" id="res_appealBiz" rows="2" placeholder="例：〇〇事業が社会課題を解決しており、自分も携わりたい"></textarea></td>
+                        <td><textarea class="res-input" id="res_appealBiz_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-group-cell" rowspan="3">選考情報</td>
+                        <td class="res-item-cell">応募資格</td>
+                        <td><textarea class="res-input" id="res_requirements" rows="1" placeholder="例：2026年3月卒業見込み、学部不問"></textarea></td>
+                        <td><textarea class="res-input" id="res_requirements_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">エントリー期日</td>
+                        <td><textarea class="res-input" id="res_entryDeadline" rows="1" placeholder="例：2025年12月31日 23:59"></textarea></td>
+                        <td><textarea class="res-input" id="res_entryDeadline_m" rows="1" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    <tr>
+                        <td class="res-item-cell">選考フロー</td>
+                        <td><textarea class="res-input" id="res_selectionFlow" rows="2" placeholder="例：ES → 1次（Web面接）→ 2次（対面）→ 最終（役員面接）"></textarea></td>
+                        <td><textarea class="res-input" id="res_selectionFlow_m" rows="2" placeholder="メモ…"></textarea></td>
+                    </tr>
+                    </tbody>
+                </table>
+                </div>
+            </details>
+
+            <details>
+                <summary>📅 面接・イベント日程</summary>
+                <div id="eventListContainer" style="padding-top:8px;"></div>
+                <button onclick="addEventItem()" class="btn btn-sm btn-secondary" style="margin-top:10px;">＋ 予定を追加</button>
+            </details>
+
+            <!-- ES 設問セクション -->
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--primary); padding-bottom:8px; margin:28px 0 16px; flex-wrap:wrap; gap:10px;">
+                <h3 style="margin:0; color:var(--primary);">📝 エントリーシート設問</h3>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button class="btn btn-sm" id="templatePasteBtn" onclick="openTemplateModal()" style="background:linear-gradient(135deg,#cffafe,#a5f3fc); color:#0e7490; border:1px solid #67e8f9;">📋 テンプレ追加</button>
+                    <button class="btn btn-sm btn-ai" onclick="generateFullEsPrompt()">🤖 ES全体添削</button>
+                    <button class="btn btn-sm btn-secondary" onclick="document.getElementById('ocrInput').click()">📷 OCR読取</button>
+                </div>
+            </div>
+            <input type="file" id="ocrInput" accept="image/*" style="display:none;">
+
+            <div id="qaContainer"></div>
+            <div style="text-align:center; padding:18px; border:2px dashed #cbd5e1; border-radius:12px; margin-top:6px;">
+                <button id="addQaBtn" class="btn btn-primary btn-sm">＋ 設問を追加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== カレンダー ===== -->
+    <div id="calendarView" class="view-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;" class="card" style="padding:15px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; width:100%; background:white; padding:14px 18px; border-radius:12px; border:1px solid var(--border);">
+                <button class="btn btn-secondary" onclick="changeMonth(-1)">◀ 前月</button>
+                <h2 id="currentMonthLabel" style="margin:0;"></h2>
+                <button class="btn btn-secondary" onclick="changeMonth(1)">翌月 ▶</button>
+            </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px; margin-bottom:6px;">
+            <div style="text-align:center; font-size:12px; font-weight:700; color:#f43f5e; padding:4px;">日</div>
+            <div style="text-align:center; font-size:12px; font-weight:700; color:#64748b; padding:4px;">月</div>
+            <div style="text-align:center; font-size:12px; font-weight:700; color:#64748b; padding:4px;">火</div>
+            <div style="text-align:center; font-size:12px; font-weight:700; color:#64748b; padding:4px;">水</div>
+            <div style="text-align:center; font-size:12px; font-weight:700; color:#64748b; padding:4px;">木</div>
+            <div style="text-align:center; font-size:12px; font-weight:700; color:#64748b; padding:4px;">金</div>
+            <div style="text-align:center; font-size:12px; font-weight:700; color:#3b82f6; padding:4px;">土</div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <!-- ===== 回答DB ===== -->
+    <div id="qaSearch" class="view-section">
+        <div class="card" style="padding:20px; margin-bottom:16px;">
+            <label style="font-size:13px; font-weight:800; color:var(--text);">🔍 キーワード検索</label>
+            <input type="text" id="searchInput" style="font-size:16px; margin-bottom:14px;" placeholder="ガクチカ、自己PR、志望動機など…">
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                <span style="font-size:12px; font-weight:700; color:#64748b; white-space:nowrap;">タイプ絞り込み:</span>
+                <div class="filter-chips" id="typeFilterChips">
+                    <button class="chip active" onclick="setTypeFilter('all',this)">すべて</button>
+                    <button class="chip" onclick="setTypeFilter('自己PR',this)">自己PR</button>
+                    <button class="chip" onclick="setTypeFilter('ガクチカ',this)">ガクチカ</button>
+                    <button class="chip" onclick="setTypeFilter('志望動機',this)">志望動機</button>
+                    <button class="chip" onclick="setTypeFilter('強み弱み',this)">強み・弱み</button>
+                    <button class="chip" onclick="setTypeFilter('将来像',this)">将来像</button>
+                    <button class="chip" onclick="setTypeFilter('学業・専攻',this)">学業・専攻</button>
+                    <button class="chip" onclick="setTypeFilter('趣味・特技',this)">趣味・特技</button>
+                    <button class="chip" onclick="setTypeFilter('その他',this)">その他</button>
+                </div>
+            </div>
+        </div>
+        <div id="qaResultContainer">
+            <p style="text-align:center; color:#9ca3af; padding:30px;">キーワードを入力するか、タイプを選択してください</p>
+        </div>
+    </div>
+
+    <!-- ===== 企業研究 ===== -->
+    <div id="researchView" class="view-section">
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7); padding:20px; border-radius:14px; border:1px solid #bbf7d0; margin-bottom:18px;">
+            <h2 style="margin:0 0 6px; color:#166534;">🔬 企業研究・2社比較</h2>
+            <p style="margin:0; font-size:13px; color:#15803d;">登録済みの企業研究メモを確認・比較できます。各案件の編集画面から研究メモを入力してください。</p>
+        </div>
+        <!-- 比較セレクター -->
+        <div class="card" style="padding:16px 20px; margin-bottom:18px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span style="font-size:13px; font-weight:700; color:#374151; white-space:nowrap;">比較する企業を選択:</span>
+            <select id="researchSelectA" onchange="renderResearchView()" style="flex:1; min-width:160px; padding:10px 12px; border-radius:8px; border:1.5px solid var(--border); font-size:16px; font-weight:700;">
+                <option value="">── 企業A を選択 ──</option>
+            </select>
+            <span style="font-size:20px; color:#94a3b8;">⇄</span>
+            <select id="researchSelectB" onchange="renderResearchView()" style="flex:1; min-width:160px; padding:10px 12px; border-radius:8px; border:1.5px solid var(--border); font-size:16px; font-weight:700;">
+                <option value="">── 企業B を選択 ──</option>
+            </select>
+        </div>
+        <div id="researchCompareContainer"></div>
+    </div>
+
+    <!-- ===== 自己分析・エピソードバンク ===== -->
+    <div id="episodeBank" class="view-section">
+        <div style="background:linear-gradient(135deg,#fff7ed,#ffedd5); padding:20px; border-radius:14px; border:1px solid #fed7aa; margin-bottom:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h2 style="margin:0 0 6px; color:#c2410c;">💼 自己分析・エピソードバンク</h2>
+                    <p style="margin:0; font-size:13px; color:#9a3412;">あなたのエピソードをストックしておくと、ES作成時にすぐ活用できます</p>
+                </div>
+                <button class="btn btn-sm btn-orange" onclick="openEpisodeEditor(null)">＋ エピソードを追加</button>
+            </div>
+        </div>
+
+        <!-- フィルター -->
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+            <span style="font-size:11px; font-weight:700; color:#64748b; white-space:nowrap;">カテゴリ:</span>
+            <div class="filter-chips" id="episodeCategoryFilter">
+                <button class="chip active" onclick="setEpisodeFilter('all',this)">すべて</button>
+                <button class="chip" onclick="setEpisodeFilter('ガクチカ',this)">ガクチカ</button>
+                <button class="chip" onclick="setEpisodeFilter('自己PR',this)">自己PR・強み</button>
+                <button class="chip" onclick="setEpisodeFilter('困難克服',this)">困難克服</button>
+                <button class="chip" onclick="setEpisodeFilter('リーダーシップ',this)">リーダーシップ</button>
+                <button class="chip" onclick="setEpisodeFilter('チームワーク',this)">チームワーク</button>
+                <button class="chip" onclick="setEpisodeFilter('失敗・挫折',this)">失敗・挫折</button>
+                <button class="chip" onclick="setEpisodeFilter('その他',this)">その他</button>
+            </div>
+        </div>
+
+        <div id="episodeBankContainer"></div>
+        <div id="episodeBankEmpty" style="display:none; text-align:center; padding:50px; color:#9ca3af;">
+            <div style="font-size:40px; margin-bottom:12px;">💼</div>
+            <p>エピソードがありません。<br>「＋ エピソードを追加」から登録しましょう。</p>
+        </div>
+    </div>
+
+    <!-- ===== 面接対策 ===== -->
+    <div id="interviewView" class="view-section">
+        <div style="background:linear-gradient(135deg,#f5f3ff,#ede9fe); padding:20px; border-radius:14px; border:1px solid #ddd6fe; margin-bottom:18px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <h2 style="margin:0 0 6px; color:var(--interview-color);">💬 面接対策ノート</h2>
+                    <p style="margin:0; font-size:13px; color:#7c3aed;">ESの回答をもとに、深掘り質問・逆質問の準備ができます</p>
+                </div>
+                <button class="btn btn-ai" onclick="generateGlobalInterviewPrompt()">🤖 複数社まとめ対策プロンプト</button>
+                <button class="btn btn-sm" onclick="generateGlobalReverseQPrompt()" style="background:linear-gradient(135deg,#fef9c3,#fef08a); color:#713f12; border:1px solid #fde047;">💡 逆質問まとめ生成</button>
+            </div>
+        </div>
+
+        <!-- ===== 想定Q&A バンク ===== -->
+        <div style="background:white; border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow); margin-bottom:24px; overflow:hidden;">
+            <div style="background:linear-gradient(to right,#1e1b4b,#312e81); padding:16px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                <div>
+                    <div style="font-size:15px; font-weight:800; color:white;">🗂 想定Q&A バンク</div>
+                    <div style="font-size:12px; color:#a5b4fc; margin-top:3px;">よく聞かれる質問と回答を記録・整理できます</div>
+                </div>
+                <button class="btn btn-sm" onclick="openIqEditor(null)" style="background:#4f46e5; color:white; border:1px solid #6366f1;">＋ Q&Aを追加</button>
+            </div>
+
+            <!-- フィルター -->
+            <div style="padding:12px 16px; border-bottom:1px solid #f1f5f9; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <span style="font-size:11px; font-weight:700; color:#64748b; white-space:nowrap;">カテゴリ:</span>
+                <div class="filter-chips" id="iqCategoryFilter" style="flex-wrap:wrap;">
+                    <button class="chip active" onclick="setIqFilter('all',this)" style="font-size:11px; padding:3px 10px;">すべて</button>
+                    <button class="chip" onclick="setIqFilter('自己紹介',this)" style="font-size:11px; padding:3px 10px;">自己紹介</button>
+                    <button class="chip" onclick="setIqFilter('ガクチカ深掘り',this)" style="font-size:11px; padding:3px 10px;">ガクチカ深掘り</button>
+                    <button class="chip" onclick="setIqFilter('自己PR深掘り',this)" style="font-size:11px; padding:3px 10px;">自己PR深掘り</button>
+                    <button class="chip" onclick="setIqFilter('志望動機深掘り',this)" style="font-size:11px; padding:3px 10px;">志望動機深掘り</button>
+                    <button class="chip" onclick="setIqFilter('強み・弱み',this)" style="font-size:11px; padding:3px 10px;">強み・弱み</button>
+                    <button class="chip" onclick="setIqFilter('将来像',this)" style="font-size:11px; padding:3px 10px;">将来像</button>
+                    <button class="chip" onclick="setIqFilter('逆質問',this)" style="font-size:11px; padding:3px 10px;">逆質問</button>
+                    <button class="chip" onclick="setIqFilter('その他',this)" style="font-size:11px; padding:3px 10px;">その他</button>
+                </div>
+                <input type="text" id="iqSearchInput" placeholder="キーワード検索…" oninput="renderIqBank()"
+                    style="margin-left:auto; width:180px; padding:6px 10px; font-size:12px; border:1.5px solid var(--border); border-radius:8px;">
+            </div>
+
+            <div id="iqBankContainer" style="padding:14px 16px; min-height:60px;"></div>
+        </div>
+
+        <!-- ===== ESベースの面接対策（既存） ===== -->
+        <div style="font-size:13px; font-weight:700; color:#64748b; margin-bottom:10px; padding-left:4px;">📄 登録済みES・面接対策メモ</div>
+        <div id="interviewContainer"></div>
+        <div id="interviewEmpty" style="display:none; text-align:center; padding:50px; color:#9ca3af;">
+            <div style="font-size:40px; margin-bottom:12px;">💬</div>
+            <p>面接対策メモがありません。<br>ES設問の「面接対策メモ」欄に記入すると、ここに表示されます。</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// ========================
+// STATE
+// ========================
+let esData =[];
+let currentId = null;
+let calDate = new Date();
+let isFavorite = false;
+let currentProofImgBase64 = "";
+let currentStatusFilter = 'all';
+let currentTypeFilter = 'all';
+let _otherAnswersData =[];
+let _targetQaAnswer = null;
+let isTemplateMode = false;
+let templateData = { qas:[] };
+
+const STORAGE_KEY = 'es-manager-pro-v9-final';
+const TEMPLATE_STORAGE_KEY = 'es-manager-pro-template';
+const LEGACY_KEYS =[
+    'es-manager-pro-v8-data','es-manager-pro-v7-data','es-manager-pro-v6',
+    'es-manager-pro-v5','es-manager-pro-v4','es-manager-pro-v3',
+    'es-manager-pro-v2','es-manager-pro-v1','es-manager-pro',
+    'esManagerData','ES_MANAGER_DATA','esManager','es-manager'
+];
+
+const QA_TYPES =['自己PR','ガクチカ','志望動機','強み弱み','将来像','学業・専攻','趣味・特技','その他'];
+
+const TYPE_COLORS = {
+    '自己PR':'#2563eb', 'ガクチカ':'#16a34a', '志望動機':'#7c3aed',
+    '強み弱み':'#ea580c', '将来像':'#ca8a04',
+    '学業・専攻':'#0891b2', '趣味・特技':'#db2777',
+    'その他':'#64748b', '':'#2563eb'
+};
+
+const TEMPLATES = {
+    '自己PR':
+`【私の強みは○○です】
+
+【エピソード・根拠（数値や具体例を含める）】
+・いつ、どこで、何をしたか
+・その中で工夫したこと
+
+【入社後の活かし方】
+この強みを貴社の〇〇で活かし、〇〇を実現したいと考えています。`,
+
+    'ガクチカ':
+`【取り組んだこと・きっかけ】
+（何に・なぜ取り組んだか）
+
+【直面した困難・課題】
+（どんな壁があったか）
+
+【自分なりの行動・工夫】
+（どう乗り越えたか・PDCAサイクルなど）
+
+【結果・成果（数値があれば）】
+（〇〇%改善 / 〇位 / 〇万円など）
+
+【学んだこと・今後への活かし方】`,
+
+    '志望動機':
+`【なぜこの業界に興味を持ったか】
+（原体験やきっかけを含めて）
+
+【数ある企業の中でなぜ御社か】
+（競合他社との違い・御社独自の強み）
+
+【入社後にやりたいこと・貢献できること】
+（具体的なポジション・プロジェクトイメージ）`,
+
+    '強み弱み':
+`【強み：○○です】
+根拠となるエピソード：
+
+【弱み：○○です】
+弱みを認識したきっかけ：
+現在の改善への取り組み：`,
+
+    '将来像':
+`【3〜5年後のビジョン】
+（具体的な役割・スキルセット）
+
+【10年後のビジョン】
+（業界・社会への貢献含む）
+
+【そのためにこの企業を選んだ理由】`,
+
+    '学業・専攻':
+`【専攻・研究テーマ】
+（何を研究・学んでいるか）
+
+【選んだ理由・きっかけ】
+（なぜこの分野に興味を持ったか）
+
+【取り組み方・工夫した点】
+（授業・実験・論文などでの工夫）
+
+【成果・学び】
+（成績・発表・受賞など）
+
+【仕事への活かし方】
+（学んだ知識・思考法を業務でどう活用するか）`,
+
+    '趣味・特技':
+`【趣味・特技の内容】
+（何をしているか、どのくらいのレベルか）
+
+【始めたきっかけ・継続している理由】
+
+【工夫していること・こだわり】
+
+【そこから身についたこと・学んだこと】
+（継続力、集中力、チームワーク等）
+
+【仕事・社会人生活への活かし方】`,
+
+    'その他': ''
+};
+
+// ========================
+// INIT
+// ========================
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    loadData();
+    loadTemplateData();
+    loadEpisodeData();
+    loadIqData();
+    updateDashboard();
+    renderList();
+
+    document.getElementById('createBtn').addEventListener('click', openNewEditor);
+    document.getElementById('cancelBtn').addEventListener('click', () => switchTab('companyList'));
+    document.getElementById('saveBtn').addEventListener('click', saveData);
+    document.getElementById('addQaBtn').addEventListener('click', () => addQaItem({}));
+    document.getElementById('searchInput').addEventListener('input', renderQaSearch);
+    document.getElementById('ocrInput').addEventListener('change', handleOcr);
+    document.getElementById('proofImgInput').addEventListener('change', handleProofImg);
+});
+
+// ========================
+// DATA – NORMALIZE (互換性)
+// ========================
+function normalizeEntry(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const entry = {
+        id: raw.id || generateId(),
+        company: raw.company || raw.companyName || raw.name || '名称不明',
+        isFavorite: !!(raw.isFavorite || raw.favorite || raw.starred || raw.bookmark),
+        status: (['Draft','Submitted','Passed','Int1','Int2','Int3','Rejected'].includes(raw.status)) ? raw.status : 'Draft',
+        myPageUrl: raw.myPageUrl || raw.url || raw.link || raw.mypage || '',
+        myPageId: raw.myPageId || raw.loginId || raw.userId || raw.login || '',
+        myPagePass: raw.myPagePass || raw.password || raw.pass || raw.pw || '',
+        deadline: raw.deadline || raw.dueDate || raw.due || raw.limitDate || '',
+        proofImg: raw.proofImg || raw.proof || raw.screenshot || raw.img || '',
+        research: (function(){
+            const r = raw.research || {};
+            const g = (...keys) => keys.map(k => r[k] || raw[k] || '').find(Boolean) || '';
+            return {
+                founded:r.founded||'', founded_m:r.founded_m||'',
+                capital:r.capital||'', capital_m:r.capital_m||'',
+                employees:r.employees||r.numbers||raw.numbers||'', employees_m:r.employees_m||'',
+                vision:g('vision')||'', vision_m:r.vision_m||'',
+                business:g('business','industry')||'', business_m:r.business_m||'',
+                strengths:g('strengths','companyStrengths','features','advantage')||'', strengths_m:r.strengths_m||'',
+                weaknesses:g('weaknesses')||'', weaknesses_m:r.weaknesses_m||'',
+                salary:r.salary||'', salary_m:r.salary_m||'',
+                salaryInc:r.salaryInc||'', salaryInc_m:r.salaryInc_m||'',
+                location:r.location||'', location_m:r.location_m||'',
+                workHours:r.workHours||g('culture')||'', workHours_m:r.workHours_m||'',
+                vacation:r.vacation||'', vacation_m:r.vacation_m||'',
+                why:g('why')||'', why_m:r.why_m||'',
+                targetDept:r.targetDept||'', targetDept_m:r.targetDept_m||'',
+                philosophy:g('philosophy','targetPerson','persona')||'', philosophy_m:r.philosophy_m||'',
+                appealStr:r.appealStr||'', appealStr_m:r.appealStr_m||'',
+                appealVision:r.appealVision||'', appealVision_m:r.appealVision_m||'',
+                appealBiz:r.appealBiz||'', appealBiz_m:r.appealBiz_m||'',
+                requirements:r.requirements||g('obog')||'', requirements_m:r.requirements_m||'',
+                entryDeadline:r.entryDeadline||'', entryDeadline_m:r.entryDeadline_m||'',
+                selectionFlow:r.selectionFlow||g('future')||'', selectionFlow_m:r.selectionFlow_m||'',
+            };
+        })(),
+        events: [],
+        qas:[],
+        updatedAt: raw.updatedAt || raw.updated || raw.createdAt || raw.created || new Date().toISOString()
+    };
+
+    const rawEvents = raw.events || raw.schedules || raw.interviews ||[];
+    entry.events = (Array.isArray(rawEvents) ? rawEvents :[]).map(e => ({
+        date: e.date || e.eventDate || e.day || '',
+        title: e.title || e.name || e.label || e.event || ''
+    })).filter(e => e.date);
+
+    const rawQas = raw.qas || raw.questions || raw.qa || raw.answers || raw.items || raw.essays ||[];
+    entry.qas = (Array.isArray(rawQas) ? rawQas :[]).map(qa => ({
+        question: qa.question || qa.q || qa.title || qa.text || qa.prompt || '',
+        answer: qa.answer || qa.a || qa.body || qa.content || qa.answerText || qa.reply || '',
+        limit: qa.limit || qa.charLimit || qa.maxLength || qa.max || qa.chars || '',
+        interview: qa.interview || qa.memo || qa.interviewNote || qa.note || qa.hint || qa.prep || '',
+        type: qa.type || qa.category || qa.tag || qa.kind || ''
+    }));
+
+    return entry;
+}
+
+// ========================
+// LOAD / PERSIST
+// ========================
+function loadData() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+                esData = parsed.map(normalizeEntry).filter(Boolean);
+                return;
+            }
+        } catch(e) {}
+    }
+
+    for (const key of LEGACY_KEYS) {
+        const legacy = localStorage.getItem(key);
+        if (!legacy) continue;
+        try {
+            const parsed = JSON.parse(legacy);
+            const arr = Array.isArray(parsed) ? parsed
+                : (parsed && parsed.data && Array.isArray(parsed.data)) ? parsed.data
+                :[];
+            if (arr.length > 0) {
+                esData = arr.map(normalizeEntry).filter(Boolean);
+                persistData();
+                showToast(`🔄 旧バックアップから${esData.length}件を移行しました`);
+                return;
+            }
+        } catch(e) {}
+    }
+    esData =[];
+}
+
+function persistData() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(esData)); } catch(e) {}
+    updateDashboard();
+}
+
+function loadTemplateData() {
+    try {
+        const saved = localStorage.getItem(TEMPLATE_STORAGE_KEY);
+        if (saved) templateData = JSON.parse(saved);
+        if (!templateData || !Array.isArray(templateData.qas)) templateData = { qas:[] };
+    } catch(e) { templateData = { qas:[] }; }
+}
+
+function persistTemplateData() {
+    try { localStorage.setItem(TEMPLATE_STORAGE_KEY, JSON.stringify(templateData)); } catch(e) {}
+}
+
+// ========================
+// DASHBOARD
+// ========================
+function updateDashboard() {
+    document.getElementById('stat-total').textContent = esData.length;
+    const submitted = esData.filter(d => d.status !== 'Draft').length;
+    document.getElementById('stat-submitted').textContent = submitted;
+
+    const INTERVIEW_STATUSES =['Int1','Int2','Int3'];
+    const passed = esData.filter(d => d.status === 'Passed' || INTERVIEW_STATUSES.includes(d.status)).length;
+    document.getElementById('stat-pass').textContent = passed > 0 ? passed : '–';
+
+    const todayMs = new Date().setHours(0,0,0,0);
+    const deadlines = esData
+        .filter(d => d.deadline && d.status === 'Draft')
+        .map(d => new Date(d.deadline))
+        .filter(d => d >= todayMs)
+        .sort((a, b) => a - b);
+    document.getElementById('stat-urgent').textContent = deadlines.length > 0
+        ? deadlines[0].toLocaleDateString('ja-JP', {month:'numeric', day:'numeric'}) + '日'
+        : '–';
+}
+
+// ========================
+// NAVIGATION
+// ========================
+function switchTab(tabName) {
+    document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+    document.getElementById(tabName).classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    const isSpecial = (tabName === 'editorView' || tabName === 'previewView');
+    document.getElementById('tabNav').style.display        = isSpecial ? 'none' : 'flex';
+    document.getElementById('mainActions').style.display   = isSpecial ? 'none' : 'block';
+    document.getElementById('statsDashboard').style.display = isSpecial ? 'none' : 'grid';
+
+    if (tabName === 'companyList')   renderList();
+    if (tabName === 'calendarView')  renderCalendar();
+    if (tabName === 'qaSearch')      renderQaSearch();
+    if (tabName === 'episodeBank')   renderEpisodeBank();
+    if (tabName === 'researchView')  renderResearchView();
+    if (tabName === 'interviewView') { renderInterviewView(); renderIqBank(); }
+}
+
+// ========================
+// FILTERS
+// ========================
+function setStatusFilter(status, btn) {
+    currentStatusFilter = status;
+    document.querySelectorAll('#statusFilter .chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+}
+
+function setTypeFilter(type, btn) {
+    currentTypeFilter = type;
+    document.querySelectorAll('#typeFilterChips .chip').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    renderQaSearch();
+}
+
+// ========================
+// LIST
+// ========================
+const STATUS_LABEL = { Draft:'下書き', Submitted:'提出済', Passed:'ES通過🎉', Int1:'1次通過✨', Int2:'2次通過✨', Int3:'3次通過✨', Rejected:'お祈り' };
+
+function renderList() {
+    const container = document.getElementById('esListContainer');
+    container.innerHTML = '';
+
+    const tmplDiv = document.createElement('div');
+    const tmplQaCount = templateData.qas ? templateData.qas.length : 0;
+    tmplDiv.className = 'es-card';
+    tmplDiv.style.cssText = 'border-left:5px solid #0891b2; background:linear-gradient(to right,#ecfeff,#ffffff);';
+    tmplDiv.innerHTML = `
+        <div class="es-header">
+            <div style="flex:1; min-width:0;">
+                <div class="company-name" style="color:#0e7490; cursor:default;">
+                    📋 ESテンプレ
+                    <span style="font-size:11px; font-weight:600; background:#cffafe; color:#0e7490; padding:2px 8px; border-radius:6px; margin-left:4px;">共通テンプレート</span>
+                </div>
+                <div style="font-size:12px; color:#64748b; margin-top:5px;">
+                    ${tmplQaCount > 0 ? `📝 ${tmplQaCount}件の設問を登録中` : '設問が未登録です。「テンプレ編集」から追加してください'}
+                </div>
+                ${templateData.memo ? `<div style="margin-top:10px; background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:10px 12px; font-size:12px; color:#166534; white-space:pre-wrap; line-height:1.65; max-height:80px; overflow:hidden; mask-image:linear-gradient(to bottom,#000 60%,transparent);">${escapeHtml(templateData.memo)}</div>` : ''}
+            </div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+            <button onclick="editTemplate()" class="btn btn-sm" style="background:#cffafe; color:#0e7490; border:1px solid #a5f3fc;">✏️ テンプレ編集</button>
+            ${tmplQaCount > 0 ? `<button onclick="previewTemplate()" class="btn btn-sm btn-secondary">👁 テンプレ確認</button>` : ''}
+        </div>
+    `;
+    container.appendChild(tmplDiv);
+
+    let filtered = currentStatusFilter === 'all' ? esData : esData.filter(d => d.status === currentStatusFilter);
+
+    document.getElementById('emptyMessage').style.display = esData.length === 0 ? 'block' : 'none';
+
+    if (filtered.length === 0 && esData.length > 0) {
+        const msg = document.createElement('p');
+        msg.style.cssText = 'text-align:center; color:#9ca3af; padding:30px;';
+        msg.textContent = 'このステータスの案件はありません';
+        container.appendChild(msg);
+        return;
+    }
+
+    const sorted = [...filtered].sort((a, b) => {
+        if (a.isFavorite !== b.isFavorite) return b.isFavorite ? 1 : -1;
+        return new Date(b.updatedAt) - new Date(a.updatedAt);
+    });
+
+    sorted.forEach(item => {
+        const totalQas = item.qas ? item.qas.length : 0;
+        const answeredQas = item.qas ? item.qas.filter(q => q.answer && q.answer.trim()).length : 0;
+        const progress = totalQas > 0 ? Math.round((answeredQas / totalQas) * 100) : 0;
+        const progressColor = progress === 100 ? '#22c55e' : progress >= 50 ? '#3b82f6' : '#f59e0b';
+
+        const div = document.createElement('div');
+        div.className = 'es-card';
+        div.innerHTML = `
+            <div class="es-header">
+                <div style="flex:1; min-width:0;">
+                    <div class="company-name" onclick="showPreview('${item.id}')">
+                        <span class="${item.isFavorite ? 'star-active' : 'star-inactive'}">${item.isFavorite ? '★' : '☆'}</span>
+                        ${escapeHtml(item.company)}
+                    </div>
+                    <div style="font-size:12px; color:#64748b; margin-top:5px; display:flex; gap:10px; flex-wrap:wrap;">
+                        <span>📌 ${item.deadline || '期限未設定'}</span>
+                        ${item.myPageUrl ? '<span>🌐 リンクあり</span>' : ''}
+                        ${item.proofImg ? '<span>🖼 証明あり</span>' : ''}
+                        ${totalQas > 0 ? `<span>📝 ${answeredQas}/${totalQas}問回答済</span>` : ''}
+                    </div>
+                    ${totalQas > 0 ? `
+                    <div class="progress-wrap">
+                        <div class="progress-bar-outer">
+                            <div class="progress-bar-inner" style="width:${progress}%; background:linear-gradient(to right,${progressColor},${progressColor}88);"></div>
+                        </div>
+                        <div class="progress-label">${progress}% 完成</div>
+                    </div>` : ''}
+                </div>
+                <span class="status-badge status-${item.status}" style="margin-top:2px;">${STATUS_LABEL[item.status] || item.status}</span>
+            </div>
+            <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+                <button onclick="showPreview('${item.id}')" class="btn btn-sm btn-secondary">👁 詳細</button>
+                <button onclick="editItem('${item.id}')" class="btn btn-sm btn-secondary">✏️ 編集</button>
+                ${item.myPageUrl ? `<a href="${escapeHtml(item.myPageUrl)}" target="_blank" rel="noopener" class="btn btn-sm btn-secondary" style="color:var(--mypage-color);">🌐 マイページ</a>` : ''}
+                <button onclick="deleteItem('${item.id}')" class="btn btn-sm btn-danger" style="margin-left:auto;">🗑 削除</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// ========================
+// PREVIEW
+// ========================
+function showPreview(id) {
+    const item = esData.find(d => d.id === id);
+    if (!item) return;
+    currentId = id;
+    document.getElementById('previewCompanyName').textContent = (item.isFavorite ? '⭐ ' : '') + item.company;
+
+    let html = `<div style="display:flex; gap:10px; align-items:center; margin-bottom:20px; flex-wrap:wrap;">
+        <span class="status-badge status-${item.status}">${STATUS_LABEL[item.status]}</span>
+        ${item.deadline ? `<span style="font-size:13px; color:#64748b;">📌 締切: ${item.deadline}</span>` : ''}
+        ${item.myPageUrl ? `<a href="${escapeHtml(item.myPageUrl)}" target="_blank" class="btn btn-sm btn-secondary" style="color:var(--mypage-color);">🌐 マイページ</a>` : ''}
+    </div>`;
+
+    if (item.proofImg) {
+        html += `<div style="margin-bottom:18px;"><div style="font-size:12px; font-weight:700; color:#64748b; margin-bottom:6px;">提出証明</div><img src="${item.proofImg}" class="proof-img-preview" onclick="viewFullImage('${item.proofImg}')"></div>`;
+    }
+
+    if (item.research && (item.research.philosophy || item.research.strengths)) {
+        html += `<div style="background:#f8fafc; border:1px solid var(--border); border-radius:10px; padding:14px; margin-bottom:18px; font-size:13px;">`;
+        if (item.research.philosophy) html += `<div style="margin-bottom:8px;"><strong style="color:#64748b;">求める人物像:</strong> ${escapeHtml(item.research.philosophy)}</div>`;
+        if (item.research.strengths)  html += `<div><strong style="color:#64748b;">企業の強み:</strong> ${escapeHtml(item.research.strengths)}</div>`;
+        html += `</div>`;
+    }
+
+    if (item.qas && item.qas.length > 0) {
+        item.qas.forEach((qa, i) => {
+            const typeTag = qa.type ? `<span class="type-tag tag-${qa.type}">${qa.type}</span>` : '';
+            html += `
+            <div style="border-left:4px solid ${TYPE_COLORS[qa.type]||'var(--primary)'}; padding:15px; margin-bottom:20px; background:#fcfcfe; border-radius:0 10px 10px 0;">
+                <div style="font-weight:700; color:#111827; margin-bottom:10px; font-size:14px;">
+                    ${typeTag}Q${i+1}. ${escapeHtml(qa.question)}
+                    <span style="font-size:11px; font-weight:400; color:#94a3b8; margin-left:6px; display:inline-block; margin-top:4px;">${qa.answer.length}文字${qa.limit ? ' / '+qa.limit+'文字' : ''}</span>
+                </div>
+                <div style="white-space:pre-wrap; color:#374151; line-height:1.75; font-size:14px;">${escapeHtml(qa.answer)}</div>
+                ${qa.interview ? `<div style="background:#faf5ff; padding:12px; border-radius:8px; margin-top:12px; font-size:13px; border:1px solid #ede9fe;"><strong style="color:var(--interview-color);">💬 面接対策メモ:</strong><br><div style="margin-top:6px; white-space:pre-wrap;">${escapeHtml(qa.interview)}</div></div>` : ''}
+            </div>`;
+        });
+    }
+
+    document.getElementById('previewContent').innerHTML = html;
+    switchTab('previewView');
+}
+
+// ========================
+// EDITOR
+// ========================
+function openNewEditor() {
+    currentId = null;
+    isFavorite = false;
+    currentProofImgBase64 = "";
+    document.getElementById('editorTitle').textContent = "新規案件作成";['companyInput','myPageUrlInput','myPageIdInput','myPagePassInput','deadlineInput'].forEach(id => document.getElementById(id).value = '');['founded','capital','employees','vision','business','strengths','weaknesses',
+     'salary','salaryInc','location','workHours','vacation',
+     'why','targetDept','philosophy','appealStr','appealVision','appealBiz',
+     'requirements','entryDeadline','selectionFlow'].forEach(k => {['res_'+k, 'res_'+k+'_m'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    });
+    document.getElementById('statusInput').value = 'Draft';
+    document.getElementById('starIcon').textContent = '☆';
+    document.getElementById('starBtn').classList.remove('btn-primary');
+    document.getElementById('eventListContainer').innerHTML = '';
+    document.getElementById('qaContainer').innerHTML = '';
+    renderProofPreview("");
+    addQaItem({});
+    switchTab('editorView');
+}
+
+function editItem(id) {
+    const item = esData.find(d => d.id === id);
+    if (!item) return;
+    currentId = id;
+    isFavorite = !!item.isFavorite;
+    currentProofImgBase64 = item.proofImg || "";
+
+    document.getElementById('editorTitle').textContent = "案件編集";
+    document.getElementById('companyInput').value      = item.company;
+    document.getElementById('statusInput').value       = item.status;
+    document.getElementById('myPageUrlInput').value    = item.myPageUrl || '';
+    document.getElementById('myPageIdInput').value     = item.myPageId || '';
+    document.getElementById('myPagePassInput').value   = item.myPagePass || '';
+    document.getElementById('deadlineInput').value     = item.deadline || '';
+    
+    const _r = item.research || {};['founded','capital','employees','vision','business','strengths','weaknesses',
+     'salary','salaryInc','location','workHours','vacation',
+     'why','targetDept','philosophy','appealStr','appealVision','appealBiz',
+     'requirements','entryDeadline','selectionFlow'].forEach(k => {
+        const el = document.getElementById('res_'+k);   if (el) el.value = _r[k]   || '';
+        const em = document.getElementById('res_'+k+'_m'); if (em) em.value = _r[k+'_m'] || '';
+    });
+    document.getElementById('starIcon').textContent    = isFavorite ? '★' : '☆';
+    document.getElementById('starBtn').classList.toggle('btn-primary', isFavorite);
+
+    renderProofPreview(currentProofImgBase64);
+
+    document.getElementById('eventListContainer').innerHTML = '';
+    (item.events ||[]).forEach((ev, idx) => addEventItem(ev, idx));
+
+    document.getElementById('qaContainer').innerHTML = '';
+    (item.qas ||[]).forEach(qa => addQaItem(qa));
+
+    switchTab('editorView');
+}
+
+function editFromPreview() { editItem(currentId); }
+
+function saveData() {
+    const companyEl = document.getElementById('companyInput');
+    if (!companyEl.value.trim()) { alert('企業名は必須です'); return; }
+
+    const newData = {
+        id: currentId || generateId(),
+        company: companyEl.value.trim(),
+        isFavorite: isFavorite,
+        status: document.getElementById('statusInput').value,
+        myPageUrl:  document.getElementById('myPageUrlInput').value,
+        myPageId:   document.getElementById('myPageIdInput').value,
+        myPagePass: document.getElementById('myPagePassInput').value,
+        deadline:   document.getElementById('deadlineInput').value,
+        proofImg:   currentProofImgBase64,
+        research: (function(){
+            const obj = {};['founded','capital','employees','vision','business','strengths','weaknesses',
+             'salary','salaryInc','location','workHours','vacation',
+             'why','targetDept','philosophy','appealStr','appealVision','appealBiz',
+             'requirements','entryDeadline','selectionFlow'].forEach(k => {
+                obj[k]      = document.getElementById('res_'+k)?.value   || '';
+                obj[k+'_m'] = document.getElementById('res_'+k+'_m')?.value || '';
+            });
+            return obj;
+        })(),
+        events: Array.from(document.querySelectorAll('#eventListContainer .event-item')).map(div => ({
+            date:  div.querySelector('.ev-date').value,
+            title: div.querySelector('.ev-title').value
+        })).filter(e => e.date),
+        qas: Array.from(document.querySelectorAll('#qaContainer .qa-item')).map(div => ({
+            question:  div.querySelector('.qa-question').value,
+            answer:    div.querySelector('.qa-answer').value,
+            limit:     div.querySelector('.qa-limit').value,
+            interview: div.querySelector('.qa-interview').value,
+            type:      div.querySelector('.qa-type').value
+        })),
+        updatedAt: new Date().toISOString()
+    };
+
+    const idx = esData.findIndex(d => d.id === currentId);
+    if (idx !== -1) esData[idx] = newData; else esData.push(newData);
+
+    persistData();
+    showToast('✅ 保存しました');
+    switchTab('companyList');
+}
+
+function toggleStar() {
+    isFavorite = !isFavorite;
+    document.getElementById('starIcon').textContent = isFavorite ? '★' : '☆';
+    document.getElementById('starBtn').classList.toggle('btn-primary', isFavorite);
+}
+
+// ========================
+// QA ITEM
+// ========================
+function addQaItem(data = {}) {
+    const div = document.createElement('div');
+    div.className = 'qa-item';
+    const type = data.type || '';
+    if (type) div.classList.add('type-' + type);
+
+    div.innerHTML = `
+        <div class="qa-item-toolbar">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                <select class="qa-type" style="font-size:14px; font-weight:700; padding:6px 12px; border-radius:8px; border:1.5px solid var(--border); cursor:pointer;" onchange="updateQaType(this)">
+                    <option value="">タイプ選択</option>
+                    <option value="自己PR"   ${type==='自己PR'   ?'selected':''}>自己PR</option>
+                    <option value="ガクチカ"  ${type==='ガクチカ'  ?'selected':''}>ガクチカ</option>
+                    <option value="志望動機"  ${type==='志望動機'  ?'selected':''}>志望動機</option>
+                    <option value="強み弱み"  ${type==='強み弱み'  ?'selected':''}>強み・弱み</option>
+                    <option value="将来像"   ${type==='将来像'   ?'selected':''}>将来像</option>
+                    <option value="学業・専攻" ${type==='学業・専攻' ?'selected':''}>学業・専攻</option>
+                    <option value="趣味・特技" ${type==='趣味・特技' ?'selected':''}>趣味・特技</option>
+                    <option value="その他"   ${type==='その他'   ?'selected':''}>その他</option>
+                </select>
+                <span style="font-size:12px; color:#94a3b8;">制限:</span>
+                <input type="number" class="qa-limit" value="${data.limit||''}" placeholder="なし" style="width:70px; padding:6px 8px; font-size:16px;">
+                <span style="font-size:12px; color:#94a3b8;">文字</span>
+            </div>
+            <div style="display:flex; gap:5px; flex-wrap:wrap;">
+                <button type="button" class="btn btn-xs btn-ai"       onclick="showQaPrompt(this)">🤖 AI案</button>
+                <button type="button" class="btn btn-xs btn-green"    onclick="loadTemplate(this)">📋 テンプレ</button>
+                <button type="button" class="btn btn-xs btn-orange"   onclick="showOtherAnswers(this)">📚 他社</button>
+                <button type="button" class="btn btn-xs btn-danger"   onclick="this.closest('.qa-item').remove()">削除</button>
+            </div>
+        </div>
+        <textarea class="qa-question" style="font-weight:700; height:60px; margin-bottom:10px;" placeholder="設問内容を入力（例：学生時代に最も力を入れたこと）">${escapeHtml(data.question||'')}</textarea>
+        <div style="position:relative;">
+            <textarea class="qa-answer" style="min-height:140px; line-height:1.7;" placeholder="回答を入力…">${escapeHtml(data.answer||'')}</textarea>
+            <div class="char-counter">0 文字</div>
+        </div>
+        <div style="background:#fff; border:1px solid #e9e3fc; padding:13px; border-radius:10px; margin-top:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                <label style="color:var(--interview-color); font-size:12px; margin:0;">💬 面接対策・想定質問メモ</label>
+                <button type="button" class="btn btn-xs btn-ai" onclick="showInterviewPrompt(this)">🤖 想定質問</button>
+            </div>
+            <textarea class="qa-interview" rows="3" placeholder="深掘り質問への対策、想定Q&Aなど…" style="border-color:#ddd6fe;">${escapeHtml(data.interview||'')}</textarea>
+        </div>
+    `;
+
+    document.getElementById('qaContainer').appendChild(div);
+
+    const typeSelect = div.querySelector('.qa-type');
+    if (type) updateQaType(typeSelect);
+
+    const ta    = div.querySelector('.qa-answer');
+    const li    = div.querySelector('.qa-limit');
+    const co    = div.querySelector('.char-counter');
+    const updateCounter = () => {
+        const cur = ta.value.length;
+        const lim = parseInt(li.value);
+        co.textContent = lim ? `${cur} / ${lim} 文字` : `${cur} 文字`;
+        co.className = 'char-counter' + (lim && cur > lim ? ' char-over' : (lim && cur / lim >= 0.8 ? ' char-ok' : ''));
+    };
+    ta.addEventListener('input', updateCounter);
+    li.addEventListener('input', updateCounter);
+    updateCounter();
+}
+
+function updateQaType(select) {
+    const item = select.closest('.qa-item');
+    QA_TYPES.forEach(t => item.classList.remove('type-' + t));
+    if (select.value) item.classList.add('type-' + select.value);
+    item.style.borderLeftColor = TYPE_COLORS[select.value] || TYPE_COLORS[''];
+}
+
+// ========================
+// AI PROMPT
+// ========================
+function showQaPrompt(btn) {
+    const qa = btn.closest('.qa-item');
+    const question  = qa.querySelector('.qa-question').value.trim();
+    const answer    = qa.querySelector('.qa-answer').value.trim();
+    const limit     = qa.querySelector('.qa-limit').value;
+    const type      = qa.querySelector('.qa-type').value;
+    const company   = document.getElementById('companyInput').value.trim();
+    const philosophy= document.getElementById('res_philosophy').value.trim();
+    const strengths = document.getElementById('res_strengths').value.trim();
+
+    let p = `以下のESの設問について、${answer ? '添削・改善' : '回答作成'}をお願いします。\n\n`;
+    p += `【企業名】: ${company || '（未入力）'}\n`;
+    if (philosophy) p += `【求める人物像・社風】: ${philosophy}\n`;
+    if (strengths)  p += `【企業の強み・特徴】: ${strengths}\n`;
+    p += `\n【設問タイプ】: ${type || '未分類'}\n`;
+    p += `【設問内容】:\n${question || '（未入力）'}\n`;
+    if (limit) p += `【文字数制限】: ${limit}文字以内\n`;
+    p += '\n';
+
+    if (answer) {
+        p += `【現在の下書き】:\n${answer}\n\n`;
+        p += `【改善してほしい点】:\n`;
+        p += `① 論理構成のチェック（PREP法・STAR法に沿っているか）\n② より魅力的で印象に残る表現への改善\n③ 具体性・数値の追加提案\n④ 文字数制限（${limit || '指定なし'}）に合わせた調整\n⑤ 企業の「求める人物像」との適合性向上\n`;
+    } else {
+        const tmpl = TEMPLATES[type] || '';
+        p += `【回答の骨子を作ってください】:\n`;
+        if (tmpl) p += `以下の構成を参考にしてください:\n${tmpl}\n\n`;
+        p += `① 回答の構成案を2〜3パターン提示\n② 押さえるべきポイントの列挙\n③ 書き出しの例文を2パターン提示\n`;
+        if (limit) p += `④ ${limit}文字以内の完成版を1つ作成\n`;
+    }
+
+    showAiModal(`🤖 AIプロンプト｜${type || '設問'}`, p);
+}
+
+function showInterviewPrompt(btn) {
+    const qa = btn.closest('.qa-item');
+    const question  = qa.querySelector('.qa-question').value.trim();
+    const answer    = qa.querySelector('.qa-answer').value.trim();
+    const type      = qa.querySelector('.qa-type').value;
+    const interview = qa.querySelector('.qa-interview').value.trim();
+    const company   = document.getElementById('companyInput').value.trim();
+
+    let p = `【面接対策】以下のESの内容をもとに、深掘り質問と対策を教えてください。\n\n`;
+    p += `【企業名】: ${company || '（未入力）'}\n`;
+    p += `【設問】:\n${question || '（未入力）'}\n\n`;
+    p += `【回答】:\n${answer || '（未入力）'}\n`;
+    if (interview) p += `\n【自分の対策メモ】:\n${interview}\n`;
+    p += `\n【お願い事項】:\n`;
+    p += `① 想定される深掘り質問を6〜8つ\n② 各質問への模範回答のポイント\n③ 答えにくい「困る質問」と対処法\n④ この企業向けの逆質問を5つ提案\n`;
+
+    showAiModal(`💬 面接対策プロンプト｜${type || '設問'}`, p);
+}
+
+function generateFullEsPrompt() {
+    const company    = document.getElementById('companyInput').value.trim();
+    const philosophy = document.getElementById('res_philosophy').value.trim();
+    const strengths  = document.getElementById('res_strengths').value.trim();
+    if (!company) { alert('企業名を入力してください'); return; }
+
+    let p = `以下の企業のエントリーシート全体を添削してください。\n\n`;
+    p += `【企業名】: ${company}\n`;
+    if (philosophy) p += `【求める人物像・社風】: ${philosophy}\n`;
+    if (strengths)  p += `【企業の強み】: ${strengths}\n\n`;
+
+    Array.from(document.querySelectorAll('#qaContainer .qa-item')).forEach((qa, i) => {
+        p += `--- 設問${i+1} ---\n`;
+        p += `Q: ${qa.querySelector('.qa-question').value}\n`;
+        if (qa.querySelector('.qa-limit').value) p += `制限: ${qa.querySelector('.qa-limit').value}文字\n`;
+        p += `A:\n${qa.querySelector('.qa-answer').value}\n\n`;
+    });
+
+    p += `【全体的な添削をお願いします】:\n`;
+    p += `① 全設問を通じた一貫性チェック\n② 各回答の論理構成の評価\n③ 文字数制限の遵守確認\n④ 企業の求める人物像との適合性評価\n`;
+
+    showAiModal(`🤖 ES全体 添削プロンプト｜${company}`, p);
+}
+
+function copyForAI() {
+    const item = esData.find(d => d.id === currentId);
+    if (!item) return;
+
+    let p = `以下の企業のエントリーシートを添削してください。\n\n【企業名】: ${item.company}\n`;
+    if (item.research?.philosophy) p += `【求める人物像】: ${item.research.philosophy}\n`;
+    if (item.research?.strengths)  p += `【企業の強み】: ${item.research.strengths}\n\n`;
+
+    (item.qas ||[]).forEach((qa, i) => {
+        p += `--- 設問${i+1} ---\nQ: ${qa.question}\n制限: ${qa.limit || 'なし'}\nA:\n${qa.answer}\n\n`;
+    });
+    p += `【添削の依頼事項】:\n・論理構成と一貫性チェック\n・より魅力的な表現への改善\n・文字数制限の遵守\n・想定深掘り質問の提案`;
+
+    showAiModal(`🤖 ES添削プロンプト｜${item.company}`, p);
+}
+
+function showAiModal(title, text) {
+    document.getElementById('aiModalTitle').textContent = title;
+    document.getElementById('aiPromptText').textContent = text;
+    document.getElementById('aiPromptModal').classList.add('active');
+}
+function closeAiModal() { document.getElementById('aiPromptModal').classList.remove('active'); }
+function copyAiPrompt() {
+    const text = document.getElementById('aiPromptText').textContent;
+    navigator.clipboard.writeText(text).then(() => showToast('📋 プロンプトをコピーしました')).catch(()=>{
+        const ta = document.createElement('textarea'); ta.value = text;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        showToast('📋 コピー完了');
+    });
+}
+
+// ========================
+// TEMPLATE
+// ========================
+function loadTemplate(btn) {
+    const qa = btn.closest('.qa-item');
+    const type = qa.querySelector('.qa-type').value;
+    if (!type) { alert('先に設問タイプを選択してください'); return; }
+    const tmpl = TEMPLATES[type];
+    if (!tmpl) { alert('このタイプのテンプレートはありません'); return; }
+    const ta = qa.querySelector('.qa-answer');
+    if (ta.value.trim() && !confirm('現在の入力をテンプレートで上書きしますか？')) return;
+    ta.value = tmpl;
+    ta.dispatchEvent(new Event('input'));
+    showToast('📋 テンプレートを適用しました');
+}
+
+// ========================
+// OTHER ANSWERS
+// ========================
+function showOtherAnswers(btn) {
+    const qa = btn.closest('.qa-item');
+    const type = qa.querySelector('.qa-type').value;
+    const currentCompany = document.getElementById('companyInput').value.trim();
+
+    _targetQaAnswer = qa.querySelector('.qa-answer');
+    _otherAnswersData =[];
+
+    esData.forEach(es => {
+        if (es.company === currentCompany) return;
+        (es.qas ||[]).forEach(q => {
+            if (!q.answer || !q.answer.trim()) return;
+            if (type && q.type && q.type !== type) return;
+            _otherAnswersData.push({ company: es.company, question: q.question, answer: q.answer, type: q.type });
+        });
+    });
+
+    const title = type ? `他社の「${type}」回答 (${_otherAnswersData.length}件)` : `他社の回答 (${_otherAnswersData.length}件)`;
+    document.getElementById('otherAnswersTitle').textContent = '📚 ' + title;
+    const list = document.getElementById('otherAnswersList');
+    list.innerHTML = '';
+
+    if (_otherAnswersData.length === 0) {
+        list.innerHTML = `<div style="text-align:center; padding:30px; color:#9ca3af;"><p>他社の回答が見つかりませんでした。</p></div>`;
+    } else {
+        _otherAnswersData.forEach((a, idx) => {
+            const d = document.createElement('div');
+            d.className = 'other-answer-item';
+            d.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
+                    <div>
+                        <span style="font-size:13px; font-weight:700; color:var(--primary);">${escapeHtml(a.company)}</span>
+                        ${a.type ? `<span class="type-tag tag-${a.type}" style="margin-left:6px;">${a.type}</span>` : ''}
+                    </div>
+                    <button class="btn btn-xs btn-primary" onclick="useThisAnswer(${idx})">流用する</button>
+                </div>
+                <div style="font-size:13px; font-weight:700; margin-bottom:6px; color:#374151;">Q. ${escapeHtml((a.question||'').substring(0,80))}${(a.question||'').length>80?'…':''}</div>
+                <div style="font-size:13px; color:#555; white-space:pre-wrap; line-height:1.6;">${escapeHtml((a.answer||'').substring(0,200))}${(a.answer||'').length>200?'…':''}</div>
+            `;
+            list.appendChild(d);
+        });
+    }
+    document.getElementById('otherAnswersModal').classList.add('active');
+}
+
+function useThisAnswer(idx) {
+    const answer = _otherAnswersData[idx]?.answer;
+    if (answer && _targetQaAnswer) {
+        if (_targetQaAnswer.value.trim() && !confirm('現在の回答を上書きしますか？')) return;
+        _targetQaAnswer.value = answer;
+        _targetQaAnswer.dispatchEvent(new Event('input'));
+        closeOtherModal();
+        showToast('📝 他社の回答を流用しました');
+    }
+}
+function closeOtherModal() { document.getElementById('otherAnswersModal').classList.remove('active'); }
+
+// ========================
+// TEMPLATE EDITOR
+// ========================
+function editTemplate() {
+    const list = document.getElementById('templateQaList');
+    list.innerHTML = '';
+    document.getElementById('templateMemoInput').value = templateData.memo || '';
+    (templateData.qas ||[]).forEach(qa => addTemplateQaRow(qa));
+    document.getElementById('templateEditorModal').classList.add('active');
+}
+function closeTemplateEditor() { document.getElementById('templateEditorModal').classList.remove('active'); }
+
+function addTemplateQaRow(data = {}) {
+    const type = data.type || '';
+    const div = document.createElement('div');
+    div.className = 'tmpl-row';
+    div.style.cssText = 'background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:14px; margin-bottom:12px; border-left:4px solid ' + (TYPE_COLORS[type] || '#0891b2') + ';';
+
+    const typeOpts =['','自己PR','ガクチカ','志望動機','強み弱み','将来像','学業・専攻','趣味・特技','その他']
+        .map(t => `<option value="${t}" ${type===t?'selected':''}>${t||'タイプ選択'}</option>`).join('');
+
+    div.innerHTML = `
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:10px;">
+            <select class="tmpl-type" style="font-size:14px; font-weight:700; padding:6px 12px; border-radius:8px; border:1.5px solid #e2e8f0; cursor:pointer;" onchange="updateTmplRowColor(this)">${typeOpts}</select>
+            <span style="font-size:12px; color:#94a3b8;">制限:</span>
+            <input type="number" class="tmpl-limit" value="${data.limit||''}" placeholder="なし" style="width:72px; padding:6px 8px; font-size:16px; border:1.5px solid #e2e8f0; border-radius:8px;">
+            <span style="font-size:12px; color:#94a3b8;">文字</span>
+            <button type="button" class="btn btn-xs btn-danger" style="margin-left:auto;" onclick="this.closest('.tmpl-row').remove()">削除</button>
+        </div>
+        <textarea class="tmpl-question" style="width:100%; padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px; font-weight:700; height:60px; resize:vertical; font-family:inherit;" placeholder="設問内容（例：学生時代に力を入れたことを教えてください）">${escapeHtml(data.question||'')}</textarea>
+        <textarea class="tmpl-answer" style="width:100%; padding:10px 12px; border:1.5px solid #e2e8f0; border-radius:8px; font-size:14px; margin-top:8px; min-height:80px; resize:vertical; font-family:inherit; color:#64748b;" placeholder="回答の下書き（任意）— ペースト時に編集画面へコピーされます">${escapeHtml(data.answer||'')}</textarea>
+    `;
+    document.getElementById('templateQaList').appendChild(div);
+}
+
+function updateTmplRowColor(sel) { sel.closest('.tmpl-row').style.borderLeftColor = TYPE_COLORS[sel.value] || '#0891b2'; }
+
+function saveTemplateEditor() {
+    const rows = document.querySelectorAll('#templateQaList .tmpl-row');
+    templateData.memo = document.getElementById('templateMemoInput').value;
+    templateData.qas = Array.from(rows).map(row => ({
+        question: row.querySelector('.tmpl-question').value,
+        type:     row.querySelector('.tmpl-type').value,
+        limit:    row.querySelector('.tmpl-limit').value,
+        answer:   row.querySelector('.tmpl-answer').value
+    })).filter(qa => qa.question.trim() || qa.answer.trim());
+    persistTemplateData();
+    renderList();
+    closeTemplateEditor();
+    showToast(`📋 テンプレを保存しました（${templateData.qas.length}件）`);
+}
+
+function previewTemplate() {
+    if (!templateData.qas || templateData.qas.length === 0) { alert('テンプレに設問が登録されていません'); return; }
+    let text = '【ESテンプレ 設問一覧】\n\n';
+    templateData.qas.forEach((qa, i) => {
+        text += `Q${i+1} [${qa.type||'分類なし'}] ${qa.limit ? '('+qa.limit+'文字)' : ''}\n設問: ${qa.question || '（未入力）'}\n`;
+        if (qa.answer) text += `下書き: ${qa.answer}\n`;
+        text += '\n';
+    });
+    showAiModal('📋 ESテンプレ確認', text);
+}
+
+function openTemplateModal() {
+    const list = document.getElementById('templatePasteList');
+    list.innerHTML = '';
+    if (!templateData.qas || templateData.qas.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:#9ca3af; padding:24px;">テンプレに設問が登録されていません。</p>';
+        document.getElementById('templatePasteModal').classList.add('active');
+        return;
+    }
+    templateData.qas.forEach((qa, idx) => {
+        const color = TYPE_COLORS[qa.type] || '#0891b2';
+        const tagHtml = qa.type ? `<span class="type-tag tag-${qa.type}">${qa.type}</span>` : '';
+        const d = document.createElement('div');
+        d.style.cssText = `background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid ${color}; border-radius:0 10px 10px 0; padding:13px 14px; margin-bottom:10px;`;
+        d.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                <div style="flex:1; min-width:0;">
+                    <div style="font-weight:700; font-size:14px; margin-bottom:4px;">${tagHtml} Q${idx+1}. ${escapeHtml((qa.question||'').substring(0,80))}${(qa.question||'').length>80?'…':''}</div>
+                    ${qa.limit ? `<div style="font-size:12px; color:#94a3b8;">制限: ${qa.limit}文字</div>` : ''}
+                </div>
+                <button class="btn btn-sm btn-primary" style="white-space:nowrap; flex-shrink:0;" onclick="pasteTemplateQa(${idx})">＋ 追加</button>
+            </div>
+        `;
+        list.appendChild(d);
+    });
+    document.getElementById('templatePasteModal').classList.add('active');
+}
+function closeTemplateModal() { document.getElementById('templatePasteModal').classList.remove('active'); }
+function pasteTemplateQa(idx) {
+    const qa = templateData.qas[idx];
+    if (!qa) return;
+    addQaItem({ question: qa.question, type: qa.type, limit: qa.limit, answer: qa.answer || '' });
+    showToast(`📋 「${(qa.question||'設問').substring(0,20)}…」を追加しました`);
+}
+
+// ========================
+// SEARCH
+// ========================
+let _searchResults =[];
+function highlightText(text, keyword) {
+    if (!keyword || !text) return escapeHtml(text || '');
+    const escaped = escapeHtml(text);
+    const safe = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return escaped.replace(new RegExp(safe, 'gi'), m => `<mark class="highlight">${m}</mark>`);
+}
+
+function renderQaSearch() {
+    const kw  = document.getElementById('searchInput').value.toLowerCase().trim();
+    const res = document.getElementById('qaResultContainer');
+    res.innerHTML = '';
+
+    if (!kw && currentTypeFilter === 'all') {
+        res.innerHTML = `<p style="text-align:center; color:#9ca3af; padding:30px;">キーワードを入力するか、タイプを選択してください</p>`;
+        _searchResults =[];
+        return;
+    }
+
+    _searchResults =[];
+    esData.forEach(es => {
+        const companyMatch = kw && es.company.toLowerCase().includes(kw);
+        (es.qas ||[]).forEach(qa => {
+            if (currentTypeFilter !== 'all' && qa.type !== currentTypeFilter) return;
+            const textMatch = !kw || companyMatch
+                || qa.question.toLowerCase().includes(kw)
+                || qa.answer.toLowerCase().includes(kw)
+                || (qa.interview && qa.interview.toLowerCase().includes(kw));
+            if (textMatch) _searchResults.push({ es, qa });
+        });
+    });
+
+    if (_searchResults.length === 0) {
+        res.innerHTML = `<p style="text-align:center; color:#9ca3af; padding:30px;">該当する回答が見つかりませんでした</p>`;
+        return;
+    }
+
+    res.innerHTML = `<div style="font-size:13px; color:#64748b; margin-bottom:12px; font-weight:700;">${_searchResults.length}件ヒット</div>`;
+
+    _searchResults.forEach(({ es, qa }, idx) => {
+        const d = document.createElement('div');
+        d.className = 'search-result-card';
+        d.style.borderLeftColor = TYPE_COLORS[qa.type] || 'var(--primary)';
+        const previewAnswer = qa.answer.length > 250 ? qa.answer.substring(0, 250) + '…' : qa.answer;
+
+        d.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:9px; flex-wrap:wrap; gap:6px;">
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                    <span style="font-size:14px; font-weight:700; color:var(--primary);">${escapeHtml(es.company)}</span>
+                    ${qa.type ? `<span class="type-tag tag-${qa.type}">${qa.type}</span>` : ''}
+                    <span style="font-size:12px; color:#94a3b8;">${qa.answer.length}文字${qa.limit?' / '+qa.limit+'文字':''}</span>
+                </div>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn btn-xs btn-secondary search-copy-btn" data-idx="${idx}">📋 コピー</button>
+                    <button class="btn btn-xs btn-secondary" onclick="editItem('${es.id}')">✏️ 編集</button>
+                    <button class="btn btn-xs btn-secondary" onclick="showPreview('${es.id}')">👁 詳細</button>
+                </div>
+            </div>
+            <div style="font-weight:700; font-size:14px; margin-bottom:8px; color:#1e293b;">Q. ${kw ? highlightText(qa.question, kw) : escapeHtml(qa.question)}</div>
+            <div style="font-size:14px; color:#475569; white-space:pre-wrap; line-height:1.7; background:#f8fafc; padding:11px; border-radius:8px;">${kw ? highlightText(previewAnswer, kw) : escapeHtml(previewAnswer)}</div>
+        `;
+        d.querySelector('.search-copy-btn').addEventListener('click', () => copyToClipboard(_searchResults[idx].qa.answer));
+        res.appendChild(d);
+    });
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => showToast('📋 コピーしました')).catch(() => {
+        const ta = document.createElement('textarea'); ta.value = text;
+        document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        showToast('📋 コピーしました');
+    });
+}
+
+// ========================
+// RESEARCH VIEW
+// ========================
+const RESEARCH_TABLE_DEF =[
+    { section:'企業の情報', sectionClass:'company', sectionRows:12, groups:[
+        { group:'基本情報', groupRows:3, items:[{key:'founded',label:'設立年度'},{key:'capital',label:'資本金'},{key:'employees',label:'従業員数'}] },
+        { group:null, items:[{key:'vision',label:'企業理念',noSub:true},{key:'business',label:'事業内容',noSub:true}] },
+        { group:'競合比較', groupRows:2, items:[{key:'strengths',label:'強み'},{key:'weaknesses',label:'弱み'}] },
+        { group:'労働条件', groupRows:5, items:[{key:'salary',label:'給与'},{key:'salaryInc',label:'昇給'},{key:'location',label:'勤務地'},{key:'workHours',label:'勤務時間'},{key:'vacation',label:'休日'}] },
+    ]},
+    { section:'自分の情報', sectionClass:'self', sectionRows:9, groups:[
+        { group:null, items:[{key:'why',label:'志望理由',noSub:true},{key:'targetDept',label:'志望部署',noSub:true}] },
+        { group:'アピール点', groupRows:4, items:[{key:'philosophy',label:'人物像の一致'},{key:'appealStr',label:'生かせる長所'},{key:'appealVision',label:'理念共感'},{key:'appealBiz',label:'事業共感'}] },
+        { group:'選考情報', groupRows:3, items:[{key:'requirements',label:'応募資格'},{key:'entryDeadline',label:'エントリ期日'},{key:'selectionFlow',label:'フロー'}] },
+    ]},
+];
+
+function buildResearchViewTable(esA, esB) {
+    const isCompare = !!(esA && esB);
+    const rv = (es, key) => ((es && es.research) ? (es.research[key] || '') : '').trim();
+
+    let html = `<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table class="res-view-table"><colgroup>
+        <col style="width:24px"><col style="width:90px"><col style="width:110px">
+        ${isCompare ? '<col><col>' : '<col><col style="width:30%">'}
+    </colgroup><thead><tr>
+        <th colspan="3" style="border:none; background:transparent;"></th>`;
+    if (isCompare) {
+        html += `<th style="background:#f0fdf4; color:#166534;">${escapeHtml(esA.company)}</th><th style="background:#eff6ff; color:#1d4ed8;">${escapeHtml(esB.company)}</th>`;
+    } else {
+        html += `<th>リサーチ結果</th><th style="background:#fafafa;">メモ</th>`;
+    }
+    html += `</tr></thead><tbody>`;
+
+    RESEARCH_TABLE_DEF.forEach(sec => {
+        let sFirst = true;
+        sec.groups.forEach(grp => {
+            let gFirst = true;
+            grp.items.forEach(item => {
+                html += '<tr>';
+                if (sFirst) { html += `<td class="res-view-section res-section-${sec.sectionClass}" rowspan="${sec.sectionRows}">${sec.section}</td>`; sFirst = false; }
+                if (item.noSub) { html += `<td class="res-view-group" colspan="2" style="font-weight:700;">${item.label}</td>`; } 
+                else {
+                    if (gFirst && grp.group) { html += `<td class="res-view-group" rowspan="${grp.groupRows}">${grp.group}</td>`; gFirst = false; }
+                    html += `<td class="res-view-item">${item.label}</td>`;
+                }
+                if (isCompare) {[esA, esB].forEach(es => {
+                        const val = rv(es, item.key), memo = rv(es, item.key+'_m');
+                        html += `<td class="res-view-val">${val ? escapeHtml(val) : '<span class="res-view-empty">未記入</span>'}`;
+                        if (memo) html += `<div style="margin-top:4px; font-size:12px; color:#94a3b8; border-top:1px solid #f1f5f9; padding-top:3px;">${escapeHtml(memo)}</div>`;
+                        html += `</td>`;
+                    });
+                } else {
+                    const es = esA || esB;
+                    const val = rv(es, item.key), memo = rv(es, item.key+'_m');
+                    html += `<td class="res-view-val">${val ? escapeHtml(val) : '<span class="res-view-empty">未記入</span>'}</td>`;
+                    html += `<td class="res-view-memo">${memo ? escapeHtml(memo) : '<span class="res-view-empty">–</span>'}</td>`;
+                }
+                html += '</tr>';
+            });
+        });
+    });
+    html += '</tbody></table></div>';
+    return html;
+}
+
+function renderResearchView() {
+    const selA = document.getElementById('researchSelectA');
+    const selB = document.getElementById('researchSelectB');
+    const prevA = selA.value, prevB = selB.value;
+    [selA, selB].forEach(sel => {
+        sel.innerHTML = '<option value="">── 選択してください ──</option>';
+        esData.forEach(es => { const opt = document.createElement('option'); opt.value = es.id; opt.textContent = es.company; sel.appendChild(opt); });
+    });
+    if (prevA) selA.value = prevA;
+    if (prevB) selB.value = prevB;
+
+    const container = document.getElementById('researchCompareContainer');
+    const esA = esData.find(d => d.id === selA.value) || null;
+    const esB = esData.find(d => d.id === selB.value) || null;
+
+    if (!esA && !esB) {
+        container.innerHTML = `<p style="text-align:center; color:#9ca3af; padding:40px;">企業を選択すると研究メモが表示されます。<br>2社選ぶと横並びで比較できます。</p>`;
+        return;
+    }
+
+    const es = esA || esB;
+    let header = `<div style="display:flex; align-items:center; gap:10px; margin-bottom:12px; flex-wrap:wrap;">`;
+    if (esA && esB) {
+        header += `<button class="btn btn-xs btn-secondary" onclick="editItem('${esA.id}')">✏️ ${escapeHtml(esA.company)}</button>`;
+        header += `<button class="btn btn-xs btn-secondary" onclick="editItem('${esB.id}')">✏️ ${escapeHtml(esB.company)}</button>`;
+    } else {
+        header += `<span style="font-size:16px; font-weight:800;">${escapeHtml(es.company)}</span>`;
+        header += `<span class="status-badge status-${es.status}">${STATUS_LABEL[es.status]||es.status}</span>`;
+        header += `<button class="btn btn-xs btn-secondary" onclick="editItem('${es.id}')">✏️ 編集</button>`;
+    }
+    header += `</div>`;
+    container.innerHTML = header + buildResearchViewTable(esA, esB);
+}
+
+// ========================
+// INTERVIEW VIEW
+// ========================
+function renderInterviewView() {
+    const container = document.getElementById('interviewContainer');
+    const empty     = document.getElementById('interviewEmpty');
+    container.innerHTML = '';
+
+    const companies = esData.filter(es =>
+        es.status === 'Submitted' || es.status === 'Passed' ||
+        es.status === 'Int1' || es.status === 'Int2' || es.status === 'Int3' ||
+        (es.qas && es.qas.some(q => q.interview && q.interview.trim()))
+    );
+
+    if (companies.length === 0) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+
+    companies.sort((a, b) => {
+        const order = { Int3: 0, Int2: 1, Int1: 2, Passed: 3, Submitted: 4, Draft: 5, Rejected: 6 };
+        return (order[a.status] ?? 2) - (order[b.status] ?? 2);
+    });
+
+    companies.forEach(es => {
+        const hasNotes = es.qas && es.qas.some(q => q.interview && q.interview.trim());
+        const section = document.createElement('div');
+        section.className = 'interview-section';
+        section.innerHTML = `
+            <div class="interview-section-header" onclick="toggleInterviewSection(this)">
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                    <span style="font-size:16px; font-weight:700;">${escapeHtml(es.company)}</span>
+                    <span class="status-badge status-${es.status}">${STATUS_LABEL[es.status]}</span>
+                </div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                    <button class="btn btn-sm btn-ai" onclick="event.stopPropagation(); generateCompanyInterviewPrompt('${es.id}')">🤖 対策プロンプト</button>
+                    <button class="btn btn-sm" onclick="event.stopPropagation(); generateReverseQPrompt('${es.id}')" style="background:linear-gradient(135deg,#fef9c3,#fef08a);color:#713f12;border:1px solid #fde047;">💡 逆質問生成</button>
+                    <button class="btn btn-sm" onclick="event.stopPropagation(); openCueCard('${es.id}')" style="background:#0f172a;color:#a78bfa;border:1px solid #4c1d95;">📺 カンペ</button>
+                    <span class="toggle-arrow" style="font-size:16px; color:#94a3b8; transition:0.2s;">▼</span>
+                </div>
+            </div>
+            <div class="interview-section-body">
+                ${(es.qas && es.qas.length > 0) ? es.qas.map((qa, i) => `
+                    <div class="interview-qa-row">
+                        <div style="font-size:14px; font-weight:700; color:#111; margin-bottom:7px;">
+                            ${qa.type ? `<span class="type-tag tag-${qa.type}">${qa.type}</span>` : ''}
+                            Q${i+1}. ${escapeHtml(qa.question || '（設問未入力）')}
+                        </div>
+                        ${qa.answer ? `<div style="font-size:13px; color:#555; background:#f8fafc; padding:12px; border-radius:6px; margin-bottom:8px; white-space:pre-wrap; line-height:1.6;">${escapeHtml(qa.answer.substring(0,200))}${qa.answer.length>200?'…':''}</div>` : ''}
+                        <div style="background:#faf5ff; border:1px solid #ede9fe; padding:12px; border-radius:8px; font-size:14px;">
+                            ${qa.interview
+                                ? `<div style="font-size:12px; font-weight:700; color:var(--interview-color); margin-bottom:5px;">💬 面接対策メモ</div><div style="white-space:pre-wrap; line-height:1.65;">${escapeHtml(qa.interview)}</div>`
+                                : `<div style="color:#94a3b8; font-size:13px; font-style:italic;">面接対策メモなし ─ 編集画面から追加できます</div>`
+                            }
+                        </div>
+                    </div>
+                `).join('') : '<p style="color:#9ca3af; font-size:14px;">設問が登録されていません</p>'}
+            </div>
+        `;
+        container.appendChild(section);
+    });
+}
+function toggleInterviewSection(header) {
+    const body = header.nextElementSibling;
+    const arrow = header.querySelector('.toggle-arrow');
+    const open = body.classList.toggle('open');
+    header.classList.toggle('open', open);
+    if (arrow) arrow.textContent = open ? '▲' : '▼';
+}
+function generateCompanyInterviewPrompt(id) {
+    const es = esData.find(d => d.id === id);
+    if (!es) return;
+    let p = `【面接対策】以下の企業の面接準備を手伝ってください。\n\n【企業名】: ${es.company}\n`;
+    if (es.research?.philosophy) p += `【求める人物像】: ${es.research.philosophy}\n`;
+    (es.qas ||[]).forEach((qa, i) => {
+        p += `\n--- 設問${i+1} ---\nQ: ${qa.question}\nA: ${qa.answer}\n`;
+        if (qa.interview) p += `【対策メモ】: ${qa.interview}\n`;
+    });
+    p += `\n【お願い事項】:\n① 各ESへの深掘り質問と回答のポイント\n② 逆質問のアイデア`;
+    showAiModal(`💬 ${es.company} 面接対策プロンプト`, p);
+}
+function generateGlobalInterviewPrompt() {
+    const companies = esData.filter(es =>['Submitted','Passed','Int1','Int2','Int3'].includes(es.status));
+    if (companies.length === 0) { alert('提出済み以上の案件がありません'); return; }
+    let p = `【複数社面接対策】以下の企業の面接を控えています。\n\n`;
+    companies.forEach(es => { p += `■ ${es.company}\n`; });
+    p += `\n【お願いすること】:\n① 各企業の重点準備ポイント\n② 志望軸の一貫性の作り方\n③ 他社選考状況の伝え方`;
+    showAiModal('💬 複数社まとめ面接対策プロンプト', p);
+}
+
+// ========================
+// 逆質問プロンプト生成
+// ========================
+function generateReverseQPrompt(id) {
+    const es = esData.find(function(d){ return d.id === id; });
+    if (!es) return;
+    var r = es.research || {};
+    var p = '【逆質問の作成依頼】以下の企業の面接で使う「逆質問」を作成してください。\n\n';
+    p += '【企業名】: ' + es.company + '\n';
+    p += '【ステータス】: ' + (STATUS_LABEL[es.status] || es.status) + '\n';
+    if (r.vision)     p += '【企業理念・ビジョン】: ' + r.vision + '\n';
+    if (r.business)   p += '【事業内容】: ' + r.business + '\n';
+    if (r.philosophy) p += '【求める人物像】: ' + r.philosophy + '\n';
+    if (r.strengths)  p += '【強み・特徴】: ' + r.strengths + '\n';
+    if (r.weaknesses) p += '【課題・弱み】: ' + r.weaknesses + '\n';
+    if (r.selectionFlow) p += '【選考フロー】: ' + r.selectionFlow + '\n';
+    if (r.why)        p += '【自分の志望理由】: ' + r.why + '\n';
+    var hasQas = es.qas && es.qas.some(function(q){ return q.answer && q.answer.trim(); });
+    if (hasQas) {
+        p += '\n【ESの回答（参考）】:\n';
+        es.qas.forEach(function(qa, i) {
+            if (!qa.answer || !qa.answer.trim()) return;
+            p += 'Q' + (i+1) + '[' + (qa.type || '設問') + ']: ' + (qa.question || '').substring(0,60) + '\n';
+            p += 'A: ' + qa.answer.substring(0, 150) + '\n\n';
+        });
+    }
+    p += '\n【お願い事項】:\n';
+    p += '以下のカテゴリで合計12〜15問の逆質問を作成してください。\n';
+    p += '① 事業・戦略への深い関心を示す質問（3問）\n';
+    p += '② 仕事の進め方・チーム・社風に関する質問（3問）\n';
+    p += '③ 成長・キャリア・育成環境に関する質問（3問）\n';
+    p += '④ 面接官の個人的な経験・やりがいを聞く質問（3問）\n';
+    p += '⑤ 入社前に準備しておくべきことに関する質問（2〜3問）\n\n';
+    p += '各質問には「なぜその質問をするか（意図）」を1行で添えてください。';
+    showAiModal('💡 ' + es.company + ' 逆質問プロンプト', p);
+}
+
+function generateGlobalReverseQPrompt() {
+    var companies = esData.filter(function(es){ return ['Submitted','Passed','Int1','Int2','Int3'].indexOf(es.status) !== -1; });
+    if (companies.length === 0) { alert('提出済み以上の案件がありません'); return; }
+    var p = '【複数社の逆質問まとめ作成】以下の各企業の面接で使える逆質問を作成してください。\n\n';
+    companies.forEach(function(es) {
+        var r = es.research || {};
+        p += '■ ' + es.company + '（' + (STATUS_LABEL[es.status] || es.status) + '）\n';
+        if (r.vision)   p += '  理念: ' + r.vision.substring(0, 60) + '\n';
+        if (r.business) p += '  事業: ' + r.business.substring(0, 60) + '\n';
+        if (r.why)      p += '  志望: ' + r.why.substring(0, 60) + '\n';
+        p += '\n';
+    });
+    p += '【お願いすること】:\n';
+    p += '① 各企業ごとに5問ずつ逆質問を作成してください\n';
+    p += '② 各企業の特性・志望理由に合った質問にしてください\n';
+    p += '③ 複数社を受けていても矛盾しない志望軸が伝わる質問にしてください';
+    showAiModal('💡 複数社まとめ逆質問プロンプト', p);
+}
+
+// ========================
+// カンペモード
+// ========================
+var _cueEs = null;
+var _cueIdx = 0;
+var _cueFontSize = 22;
+var _cueQas = [];
+
+function openCueCard(id) {
+    var es = esData.find(function(d){ return d.id === id; });
+    if (!es) return;
+    var qas = (es.qas || []).filter(function(qa){ return qa.question || qa.answer || qa.interview; });
+    if (qas.length === 0) { alert('この案件には設問が登録されていません'); return; }
+    _cueEs = es; _cueQas = qas; _cueIdx = 0; _cueFontSize = 22;
+
+    document.getElementById('cueCompanyName').textContent = es.company;
+    var badge = document.getElementById('cueStatusBadge');
+    badge.textContent = STATUS_LABEL[es.status] || es.status;
+    badge.className = 'status-badge status-' + es.status;
+
+    // research strip
+    var r = es.research || {};
+    var strip = document.getElementById('cueResearchStrip');
+    var items = [];
+    if (r.philosophy)   items.push({ label: '求める人物像', val: r.philosophy });
+    if (r.vision)       items.push({ label: '理念', val: r.vision });
+    if (r.strengths)    items.push({ label: '強み', val: r.strengths });
+    if (r.why)          items.push({ label: '志望理由メモ', val: r.why });
+    if (items.length) {
+        strip.style.display = 'flex';
+        strip.innerHTML = items.map(function(it){
+            return '<span style="font-size:12px; color:#94a3b8;"><strong style="color:#e2e8f0;">' +
+                escapeHtml(it.label) + ':</strong> ' +
+                escapeHtml(it.val.substring(0, 80)) + (it.val.length > 80 ? '…' : '') + '</span>';
+        }).join('');
+    } else {
+        strip.style.display = 'none';
+    }
+
+    // dots
+    var dots = document.getElementById('cueDots');
+    dots.innerHTML = qas.map(function(_, i){
+        return '<button onclick="cueGoTo(' + i + ')" title="' + (i+1) + '問目" style="width:10px; height:10px; border-radius:50%; background:' + (i===0?'#8b5cf6':'#334155') + '; border:none; cursor:pointer; transition:0.15s; padding:0;"></button>';
+    }).join('');
+
+    var overlay = document.getElementById('cueCardOverlay');
+    overlay.style.display = 'flex';
+    document.addEventListener('keydown', _cueKeyHandler);
+    _cueRender();
+}
+
+function closeCueCard() {
+    document.getElementById('cueCardOverlay').style.display = 'none';
+    document.removeEventListener('keydown', _cueKeyHandler);
+    _cueEs = null;
+}
+
+function _cueKeyHandler(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); cueMoveStep(1); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); cueMoveStep(-1); }
+    if (e.key === 'Escape') closeCueCard();
+}
+
+function _cueRender() {
+    if (!_cueEs || !_cueQas.length) return;
+    var qa = _cueQas[_cueIdx];
+    if (!qa) return;
+
+    document.getElementById('cueProgressLabel').textContent = (_cueIdx + 1) + ' / ' + _cueQas.length;
+
+    // update dots
+    var dotBtns = document.querySelectorAll('#cueDots button');
+    dotBtns.forEach(function(d, i){ d.style.background = i === _cueIdx ? '#8b5cf6' : '#334155'; });
+
+    // nav buttons
+    document.getElementById('cuePrevBtn').disabled = _cueIdx === 0;
+    document.getElementById('cueNextBtn').disabled = _cueIdx === _cueQas.length - 1;
+    document.getElementById('cuePrevBtn').style.opacity = _cueIdx === 0 ? '0.3' : '1';
+    document.getElementById('cueNextBtn').style.opacity = _cueIdx === _cueQas.length - 1 ? '0.3' : '1';
+
+    var typeColors = {
+        '\u81ea\u5df1PR':'#60a5fa', '\u30ac\u30af\u30c1\u30ab':'#4ade80', '\u5fd7\u671b\u52d5\u6a5f':'#c084fc',
+        '\u5f37\u307f\u5f31\u307f':'#fb923c', '\u5c06\u6765\u50cf':'#facc15',
+        '\u5b66\u696d\u30fb\u5c02\u653b':'#22d3ee', '\u8da3\u5473\u30fb\u7279\u6280':'#f472b6', '':'#94a3b8'
+    };
+    var col = typeColors[qa.type || ''] || '#94a3b8';
+    var typeTag = qa.type ? '<span style="font-size:12px; font-weight:800; color:' + col + '; margin-right:8px;">[' + escapeHtml(qa.type) + ']</span>' : '';
+
+    var answerHtml = qa.answer
+        ? '<div style="font-size:' + _cueFontSize + 'px; font-weight:500; color:#f1f5f9; line-height:1.85; white-space:pre-wrap; margin-bottom:24px;">' + escapeHtml(qa.answer) + '</div>'
+        : '<div style="font-size:' + _cueFontSize + 'px; color:#475569; font-style:italic; margin-bottom:24px;">（回答未入力）</div>';
+
+    var memoHtml = '';
+    if (qa.interview && qa.interview.trim()) {
+        var memoSize = Math.round(_cueFontSize * 0.77);
+        memoHtml = '<div style="background:#1e293b; border:1px solid #4c1d95; border-left:4px solid #8b5cf6; border-radius:10px; padding:16px 20px;">'
+            + '<div style="font-size:11px; font-weight:800; color:#a78bfa; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.06em;">💬 面接対策メモ</div>'
+            + '<div style="font-size:' + memoSize + 'px; color:#c4b5fd; line-height:1.75; white-space:pre-wrap;">' + escapeHtml(qa.interview) + '</div>'
+            + '</div>';
+    }
+
+    document.getElementById('cueBody').innerHTML =
+        '<div style="max-width:900px; margin:0 auto;">'
+        + '<div style="font-size:15px; font-weight:700; color:#94a3b8; margin-bottom:14px; line-height:1.5; padding-bottom:10px; border-bottom:1px solid #334155;">'
+        + typeTag + 'Q' + (_cueIdx + 1) + '. ' + escapeHtml(qa.question || '（設問未入力）') + '</div>'
+        + answerHtml + memoHtml + '</div>';
+
+    document.getElementById('cueBody').scrollTop = 0;
+}
+
+function cueMoveStep(delta) {
+    _cueIdx = Math.max(0, Math.min(_cueQas.length - 1, _cueIdx + delta));
+    _cueRender();
+}
+
+function cueGoTo(idx) { _cueIdx = idx; _cueRender(); }
+
+function cueChangeFontSize(delta) {
+    _cueFontSize = Math.max(14, Math.min(36, _cueFontSize + delta));
+    _cueRender();
+}
+
+
+// ========================
+// エピソードバンク
+// ========================
+var episodeData = [];
+var currentEpisodeFilter = 'all';
+var EPISODE_STORAGE_KEY = 'es-manager-pro-episodes';
+
+function loadEpisodeData() {
+    try {
+        var s = localStorage.getItem(EPISODE_STORAGE_KEY);
+        if (s) episodeData = JSON.parse(s);
+        if (!Array.isArray(episodeData)) episodeData = [];
+    } catch(e) { episodeData = []; }
+}
+
+function persistEpisodeData() {
+    try { localStorage.setItem(EPISODE_STORAGE_KEY, JSON.stringify(episodeData)); } catch(e) {}
+}
+
+var EP_CAT_COLORS = {
+    'ガクチカ':       { bg:'#dcfce7', color:'#166534', border:'#bbf7d0' },
+    '自己PR':        { bg:'#dbeafe', color:'#1e40af', border:'#bfdbfe' },
+    '困難克服':       { bg:'#fce7f3', color:'#9d174d', border:'#fbcfe8' },
+    'リーダーシップ':  { bg:'#ede9fe', color:'#5b21b6', border:'#ddd6fe' },
+    'チームワーク':    { bg:'#cffafe', color:'#0e7490', border:'#a5f3fc' },
+    '失敗・挫折':     { bg:'#fee2e2', color:'#991b1b', border:'#fecaca' },
+    'その他':         { bg:'#f1f5f9', color:'#475569', border:'#e2e8f0' }
+};
+
+function setEpisodeFilter(cat, btn) {
+    currentEpisodeFilter = cat;
+    document.querySelectorAll('#episodeCategoryFilter .chip').forEach(function(c){ c.classList.remove('active'); });
+    btn.classList.add('active');
+    renderEpisodeBank();
+}
+
+function renderEpisodeBank() {
+    var container = document.getElementById('episodeBankContainer');
+    var emptyEl   = document.getElementById('episodeBankEmpty');
+    container.innerHTML = '';
+
+    var filtered = currentEpisodeFilter === 'all'
+        ? episodeData
+        : episodeData.filter(function(ep){ return ep.category === currentEpisodeFilter; });
+
+    // Sort: star desc, then updatedAt desc
+    filtered = filtered.slice().sort(function(a, b){
+        if ((b.star||1) !== (a.star||1)) return (b.star||1) - (a.star||1);
+        return (b.updatedAt||'') > (a.updatedAt||'') ? 1 : -1;
+    });
+
+    emptyEl.style.display = (episodeData.length === 0) ? 'block' : 'none';
+
+    if (filtered.length === 0 && episodeData.length > 0) {
+        container.innerHTML = '<p style="text-align:center; color:#9ca3af; padding:30px;">このカテゴリのエピソードはありません</p>';
+        return;
+    }
+
+    filtered.forEach(function(ep) {
+        var c = EP_CAT_COLORS[ep.category] || EP_CAT_COLORS['その他'];
+        var stars = '⭐'.repeat(ep.star || 1);
+        var tags  = (ep.usableTags || []).map(function(t){
+            return '<span style="font-size:10px; font-weight:700; background:#f1f5f9; color:#475569; padding:2px 7px; border-radius:10px;">' + escapeHtml(t) + '</span>';
+        }).join(' ');
+
+        var card = document.createElement('div');
+        card.className = 'es-card';
+        card.style.cssText = 'border-left:5px solid ' + c.border + '; margin-bottom:14px;';
+        card.innerHTML =
+            '<div class="es-header">' +
+                '<div style="flex:1; min-width:0;">' +
+                    '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px;">' +
+                        '<span style="font-size:16px; font-weight:800; color:#1e293b;">' + escapeHtml(ep.title || '（タイトル未入力）') + '</span>' +
+                        '<span style="font-size:11px; font-weight:700; background:' + c.bg + '; color:' + c.color + '; border:1px solid ' + c.border + '; padding:2px 9px; border-radius:12px;">' + escapeHtml(ep.category || '') + '</span>' +
+                        '<span style="font-size:12px;">' + stars + '</span>' +
+                    '</div>' +
+                    (tags ? '<div style="display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px;">' + tags + '</div>' : '') +
+                    (ep.result ? '<div style="font-size:12px; color:#64748b; margin-top:2px;">🏆 ' + escapeHtml(ep.result.substring(0,80)) + (ep.result.length>80?'…':'') + '</div>' : '') +
+                '</div>' +
+            '</div>' +
+            '<div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">' +
+                '<button class="btn btn-sm btn-secondary" onclick="toggleEpisodeDetail(\'' + ep.id + '\')">📖 詳細</button>' +
+                '<button class="btn btn-sm btn-secondary" onclick="openEpisodeEditor(\'' + ep.id + '\')">✏️ 編集</button>' +
+                '<button class="btn btn-sm btn-ai" onclick="generateEpisodePrompt(\'' + ep.id + '\')">🤖 ES活用プロンプト</button>' +
+                '<button class="btn btn-sm btn-danger" onclick="deleteEpisode(\'' + ep.id + '\')" style="margin-left:auto;">🗑</button>' +
+            '</div>' +
+            '<div id="epDetail-' + ep.id + '" style="display:none; margin-top:14px;">' +
+                _buildEpisodeDetailHtml(ep) +
+            '</div>';
+        container.appendChild(card);
+    });
+}
+
+function _buildEpisodeDetailHtml(ep) {
+    var rows = [
+        { label: '🌍 Situation（状況・背景）', val: ep.situation },
+        { label: '🎯 Task（課題・目標）',       val: ep.task      },
+        { label: '⚡ Action（行動・工夫）',      val: ep.action    },
+        { label: '🏆 Result（結果・成果）',      val: ep.result    },
+        { label: '💡 学び・得たスキル',          val: ep.learning  },
+        { label: '📝 自由メモ',                  val: ep.memo      },
+    ];
+    var html = '<div style="border-top:1px solid #f1f5f9; padding-top:12px; display:grid; gap:10px;">';
+    rows.forEach(function(r){
+        if (!r.val || !r.val.trim()) return;
+        html += '<div style="background:#f8fafc; border-radius:8px; padding:10px 14px;">'
+            + '<div style="font-size:11px; font-weight:800; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;">' + r.label + '</div>'
+            + '<div style="font-size:13px; color:#1e293b; white-space:pre-wrap; line-height:1.65;">' + escapeHtml(r.val) + '</div>'
+            + '</div>';
+    });
+    html += '</div>';
+    return html;
+}
+
+function toggleEpisodeDetail(id) {
+    var el = document.getElementById('epDetail-' + id);
+    if (!el) return;
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function openEpisodeEditor(id) {
+    var ep = id ? episodeData.find(function(e){ return e.id === id; }) : null;
+    document.getElementById('episodeEditorTitle').textContent = ep ? '💼 エピソード編集' : '💼 エピソード追加';
+    document.getElementById('epEditingId').value = id || '';
+    document.getElementById('epTitle').value     = ep ? (ep.title     || '') : '';
+    document.getElementById('epCategory').value  = ep ? (ep.category  || 'ガクチカ') : 'ガクチカ';
+    document.getElementById('epStar').value      = ep ? String(ep.star || 3) : '3';
+    document.getElementById('epSituation').value = ep ? (ep.situation || '') : '';
+    document.getElementById('epTask').value      = ep ? (ep.task      || '') : '';
+    document.getElementById('epAction').value    = ep ? (ep.action    || '') : '';
+    document.getElementById('epResult').value    = ep ? (ep.result    || '') : '';
+    document.getElementById('epLearning').value  = ep ? (ep.learning  || '') : '';
+    document.getElementById('epMemo').value      = ep ? (ep.memo      || '') : '';
+    // checkboxes
+    var tags = ep ? (ep.usableTags || []) : [];
+    document.querySelectorAll('#epUsableTags input[type=checkbox]').forEach(function(cb){
+        cb.checked = tags.indexOf(cb.value) !== -1;
+    });
+    document.getElementById('episodeEditorModal').classList.add('active');
+}
+
+function closeEpisodeEditor() {
+    document.getElementById('episodeEditorModal').classList.remove('active');
+}
+
+function saveEpisode() {
+    var title = document.getElementById('epTitle').value.trim();
+    if (!title) { alert('エピソードタイトルは必須です'); return; }
+    var tags = [];
+    document.querySelectorAll('#epUsableTags input[type=checkbox]:checked').forEach(function(cb){ tags.push(cb.value); });
+    var id   = document.getElementById('epEditingId').value || (Date.now().toString(36) + Math.random().toString(36).substr(2,5));
+    var ep = {
+        id:        id,
+        title:     title,
+        category:  document.getElementById('epCategory').value,
+        star:      parseInt(document.getElementById('epStar').value) || 1,
+        situation: document.getElementById('epSituation').value,
+        task:      document.getElementById('epTask').value,
+        action:    document.getElementById('epAction').value,
+        result:    document.getElementById('epResult').value,
+        learning:  document.getElementById('epLearning').value,
+        memo:      document.getElementById('epMemo').value,
+        usableTags: tags,
+        updatedAt: new Date().toISOString()
+    };
+    var idx = episodeData.findIndex(function(e){ return e.id === id; });
+    if (idx !== -1) episodeData[idx] = ep; else episodeData.push(ep);
+    persistEpisodeData();
+    renderEpisodeBank();
+    closeEpisodeEditor();
+    showToast('💼 エピソードを保存しました');
+}
+
+function deleteEpisode(id) {
+    if (!confirm('このエピソードを削除しますか？')) return;
+    episodeData = episodeData.filter(function(e){ return e.id !== id; });
+    persistEpisodeData();
+    renderEpisodeBank();
+    showToast('🗑 削除しました');
+}
+
+function generateEpisodePrompt(id) {
+    var ep = episodeData.find(function(e){ return e.id === id; });
+    if (!ep) return;
+    var p = '【ESへの活用依頼】以下の自己分析エピソードをもとに、ES・面接回答を作成してください。\n\n';
+    p += '【エピソードタイトル】: ' + ep.title + '\n';
+    p += '【カテゴリ】: ' + ep.category + '\n';
+    if (ep.situation) p += '\n【Situation（状況）】:\n' + ep.situation + '\n';
+    if (ep.task)      p += '\n【Task（課題・目標）】:\n' + ep.task + '\n';
+    if (ep.action)    p += '\n【Action（行動・工夫）】:\n' + ep.action + '\n';
+    if (ep.result)    p += '\n【Result（結果・成果）】:\n' + ep.result + '\n';
+    if (ep.learning)  p += '\n【学び・スキル】:\n' + ep.learning + '\n';
+    if (ep.memo)      p += '\n【補足メモ】:\n' + ep.memo + '\n';
+    p += '\n【お願いすること】:\n';
+    p += '① このエピソードを使ったガクチカ（300字・400字・600字の3パターン）\n';
+    p += '② 自己PR版（300字・400字）\n';
+    p += '③ 面接で「もっと詳しく」と深掘りされた際の補足ポイント3つ\n';
+    p += '④ このエピソードから読み取れる強み・アピールポイントの提案';
+    showAiModal('🤖 ' + ep.title + ' ─ ES活用プロンプト', p);
+}
+
+
+// ========================
+// 想定Q&Aバンク
+// ========================
+var iqData = [];
+var currentIqFilter = 'all';
+var IQ_STORAGE_KEY = 'es-manager-pro-iq';
+
+function loadIqData() {
+    try {
+        var s = localStorage.getItem(IQ_STORAGE_KEY);
+        if (s) iqData = JSON.parse(s);
+        if (!Array.isArray(iqData)) iqData = [];
+    } catch(e) { iqData = []; }
+}
+
+function persistIqData() {
+    try { localStorage.setItem(IQ_STORAGE_KEY, JSON.stringify(iqData)); } catch(e) {}
+}
+
+var IQ_CAT_STYLE = {
+    '自己紹介':      { bg:'#dbeafe', color:'#1e40af' },
+    'ガクチカ深掘り': { bg:'#dcfce7', color:'#166534' },
+    '自己PR深掘り':  { bg:'#ede9fe', color:'#5b21b6' },
+    '志望動機深掘り': { bg:'#fce7f3', color:'#9d174d' },
+    '強み・弱み':    { bg:'#ffedd5', color:'#c2410c' },
+    '将来像':        { bg:'#fef9c3', color:'#854d0e' },
+    '逆質問':        { bg:'#cffafe', color:'#0e7490' },
+    'その他':        { bg:'#f1f5f9', color:'#475569' }
+};
+var IQ_DIFF_LABEL = { '3':'🔴 難しい', '2':'🟡 普通', '1':'🟢 簡単' };
+var IQ_MAST_LABEL = { '0':'❓ 未対策', '1':'📝 対策中', '2':'✅ 完璧' };
+var IQ_MAST_COLOR = { '0':'#ef4444', '1':'#f59e0b', '2':'#22c55e' };
+
+function setIqFilter(cat, btn) {
+    currentIqFilter = cat;
+    document.querySelectorAll('#iqCategoryFilter .chip').forEach(function(c){ c.classList.remove('active'); });
+    btn.classList.add('active');
+    renderIqBank();
+}
+
+function renderIqBank() {
+    var container = document.getElementById('iqBankContainer');
+    if (!container) return;
+
+    var kw = (document.getElementById('iqSearchInput') ? document.getElementById('iqSearchInput').value.toLowerCase().trim() : '');
+
+    var filtered = iqData.filter(function(iq) {
+        if (currentIqFilter !== 'all' && iq.category !== currentIqFilter) return false;
+        if (kw) {
+            var haystack = ((iq.question||'') + (iq.answer||'') + (iq.points||'') + (iq.record||'')).toLowerCase();
+            if (haystack.indexOf(kw) === -1) return false;
+        }
+        return true;
+    });
+
+    // sort: mastery asc (未対策が先), then difficulty desc
+    filtered = filtered.slice().sort(function(a, b) {
+        var md = (parseInt(a.mastery)||0) - (parseInt(b.mastery)||0);
+        if (md !== 0) return md;
+        return (parseInt(b.difficulty)||2) - (parseInt(a.difficulty)||2);
+    });
+
+    if (iqData.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#9ca3af; padding:20px; font-size:13px;">まだQ&Aが登録されていません。「＋ Q&Aを追加」から登録しましょう。</p>';
+        return;
+    }
+    if (filtered.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#9ca3af; padding:16px; font-size:13px;">条件に一致するQ&Aがありません</p>';
+        return;
+    }
+
+    // stats bar
+    var total   = iqData.length;
+    var done    = iqData.filter(function(iq){ return String(iq.mastery) === '2'; }).length;
+    var inProg  = iqData.filter(function(iq){ return String(iq.mastery) === '1'; }).length;
+    var notYet  = iqData.filter(function(iq){ return String(iq.mastery) === '0' || !iq.mastery; }).length;
+    var pct     = total > 0 ? Math.round(done / total * 100) : 0;
+
+    var statsHtml = '<div style="background:#f8fafc; border-radius:10px; padding:10px 14px; margin-bottom:12px; display:flex; align-items:center; gap:14px; flex-wrap:wrap;">'
+        + '<span style="font-size:12px; font-weight:700; color:#374151;">全' + total + '問</span>'
+        + '<span style="font-size:12px; color:#22c55e; font-weight:700;">✅ 完璧: ' + done + '</span>'
+        + '<span style="font-size:12px; color:#f59e0b; font-weight:700;">📝 対策中: ' + inProg + '</span>'
+        + '<span style="font-size:12px; color:#ef4444; font-weight:700;">❓ 未対策: ' + notYet + '</span>'
+        + '<div style="flex:1; min-width:120px;">'
+        +   '<div style="height:6px; background:#e2e8f0; border-radius:3px; overflow:hidden;">'
+        +     '<div style="height:100%; width:' + pct + '%; background:linear-gradient(to right,#22c55e,#4ade80); border-radius:3px; transition:width 0.4s;"></div>'
+        +   '</div>'
+        +   '<div style="font-size:10px; color:#94a3b8; margin-top:2px;">習熟度 ' + pct + '%</div>'
+        + '</div>'
+        + '</div>';
+
+    var cardsHtml = filtered.map(function(iq) {
+        var cs  = IQ_CAT_STYLE[iq.category] || IQ_CAT_STYLE['その他'];
+        var mc  = IQ_MAST_COLOR[String(iq.mastery)] || '#ef4444';
+        var ml  = IQ_MAST_LABEL[String(iq.mastery)] || '❓ 未対策';
+        var dl  = IQ_DIFF_LABEL[String(iq.difficulty)] || '🟡 普通';
+        var detailId = 'iqDetail-' + iq.id;
+
+        return '<div style="border:1px solid #e2e8f0; border-radius:10px; margin-bottom:10px; overflow:hidden; border-left:4px solid ' + mc + ';">'
+
+            // header row
+            + '<div style="padding:11px 14px; display:flex; align-items:flex-start; gap:10px; cursor:pointer; background:#fafafa;" onclick="toggleIqDetail(\'' + iq.id + '\')">'
+            +   '<div style="flex:1; min-width:0;">'
+            +     '<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:5px;">'
+            +       '<span style="font-size:11px; font-weight:700; background:' + cs.bg + '; color:' + cs.color + '; padding:2px 8px; border-radius:10px;">' + escapeHtml(iq.category||'') + '</span>'
+            +       '<span style="font-size:11px; color:#64748b;">' + dl + '</span>'
+            +       '<span style="font-size:11px; font-weight:700; color:' + mc + ';">' + ml + '</span>'
+            +     '</div>'
+            +     '<div style="font-size:14px; font-weight:700; color:#1e293b; line-height:1.5;">' + escapeHtml((iq.question||'（質問未入力）')) + '</div>'
+            +   '</div>'
+            +   '<div style="display:flex; gap:5px; flex-shrink:0;">'
+            +     '<button class="btn btn-xs btn-secondary" onclick="event.stopPropagation(); openIqEditor(\'' + iq.id + '\')">✏️</button>'
+            +     '<button class="btn btn-xs btn-danger" onclick="event.stopPropagation(); deleteIq(\'' + iq.id + '\')">🗑</button>'
+            +   '</div>'
+            + '</div>'
+
+            // detail (collapsed)
+            + '<div id="' + detailId + '" style="display:none; padding:14px; border-top:1px solid #f1f5f9; background:white;">'
+            +   (iq.answer ? '<div style="margin-bottom:10px;"><div style="font-size:11px; font-weight:800; color:#059669; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;">✅ 回答</div><div style="font-size:14px; color:#1e293b; white-space:pre-wrap; line-height:1.75; background:#f0fdf4; padding:12px; border-radius:8px; border-left:3px solid #4ade80;">' + escapeHtml(iq.answer) + '</div></div>' : '')
+            +   '<div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">'
+            +     (iq.points  ? '<div><div style="font-size:11px; font-weight:800; color:#d97706; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;">⚡ ポイント</div><div style="font-size:13px; white-space:pre-wrap; color:#374151; background:#fffbeb; padding:10px; border-radius:8px;">' + escapeHtml(iq.points) + '</div></div>' : '<div></div>')
+            +     (iq.caution ? '<div><div style="font-size:11px; font-weight:800; color:#dc2626; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;">⚠️ 注意</div><div style="font-size:13px; white-space:pre-wrap; color:#374151; background:#fff5f5; padding:10px; border-radius:8px;">' + escapeHtml(iq.caution) + '</div></div>' : '<div></div>')
+            +   '</div>'
+            +   (iq.record ? '<div><div style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:5px;">📌 実際に聞かれた記録</div><div style="font-size:12px; color:#64748b; white-space:pre-wrap; background:#f8fafc; padding:9px 12px; border-radius:8px;">' + escapeHtml(iq.record) + '</div></div>' : '')
+            +   '<div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">'
+            +     '<button class="btn btn-xs btn-secondary" onclick="cycleIqMastery(\'' + iq.id + '\')" style="font-weight:800; color:' + mc + ';">' + ml + ' → 次へ</button>'
+            +     '<button class="btn btn-xs btn-ai" onclick="generateIqAiPrompt(\'' + iq.id + '\')" style="background:linear-gradient(135deg,#ede9fe,#ddd6fe);color:#6d28d9;border:1px solid #c4b5fd;">🤖 AI相談</button>'
+            +     '<button class="btn btn-xs btn-secondary" onclick="openIqEditor(\'' + iq.id + '\')">✏️ 編集</button>'
+            +   '</div>'
+            + '</div>'
+            + '</div>';
+    }).join('');
+
+    container.innerHTML = statsHtml + cardsHtml;
+}
+
+function toggleIqDetail(id) {
+    var el = document.getElementById('iqDetail-' + id);
+    if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function cycleIqMastery(id) {
+    var iq = iqData.find(function(e){ return e.id === id; });
+    if (!iq) return;
+    var cur = parseInt(iq.mastery) || 0;
+    iq.mastery = String((cur + 1) % 3);
+    iq.updatedAt = new Date().toISOString();
+    persistIqData();
+    renderIqBank();
+    showToast(IQ_MAST_LABEL[iq.mastery] + ' に更新しました');
+}
+
+function openIqEditor(id) {
+    var iq = id ? iqData.find(function(e){ return e.id === id; }) : null;
+    document.getElementById('iqEditorTitle').textContent = iq ? '🗂 Q&A 編集' : '🗂 Q&A 追加';
+    document.getElementById('iqEditingId').value    = id || '';
+    document.getElementById('iqCategory').value     = iq ? (iq.category   || '自己紹介') : '自己紹介';
+    document.getElementById('iqDifficulty').value   = iq ? String(iq.difficulty || 2) : '2';
+    document.getElementById('iqMastery').value      = iq ? String(iq.mastery    || 0) : '0';
+    document.getElementById('iqQuestion').value     = iq ? (iq.question || '') : '';
+    document.getElementById('iqAnswer').value       = iq ? (iq.answer   || '') : '';
+    document.getElementById('iqPoints').value       = iq ? (iq.points   || '') : '';
+    document.getElementById('iqCaution').value      = iq ? (iq.caution  || '') : '';
+    document.getElementById('iqRecord').value       = iq ? (iq.record   || '') : '';
+    document.getElementById('iqEditorModal').classList.add('active');
+}
+
+function closeIqEditor() {
+    document.getElementById('iqEditorModal').classList.remove('active');
+}
+
+function saveIq() {
+    var q = document.getElementById('iqQuestion').value.trim();
+    if (!q) { alert('質問を入力してください'); return; }
+    var id = document.getElementById('iqEditingId').value || (Date.now().toString(36) + Math.random().toString(36).substr(2,5));
+    var iq = {
+        id:         id,
+        category:   document.getElementById('iqCategory').value,
+        difficulty: document.getElementById('iqDifficulty').value,
+        mastery:    document.getElementById('iqMastery').value,
+        question:   q,
+        answer:     document.getElementById('iqAnswer').value,
+        points:     document.getElementById('iqPoints').value,
+        caution:    document.getElementById('iqCaution').value,
+        record:     document.getElementById('iqRecord').value,
+        updatedAt:  new Date().toISOString()
+    };
+    var idx = iqData.findIndex(function(e){ return e.id === id; });
+    if (idx !== -1) iqData[idx] = iq; else iqData.push(iq);
+    persistIqData();
+    renderIqBank();
+    closeIqEditor();
+    showToast('🗂 Q&Aを保存しました');
+}
+
+function generateIqAiPrompt(id) {
+    var iq = iqData.find(function(e){ return e.id === id; });
+    if (!iq) return;
+
+    var p = '【面接想定Q&A 相談依頼】\n\n';
+    p += '面接で以下の質問をされた場合の回答について、アドバイスをお願いします。\n\n';
+    p += '━━━━━━━━━━━━━━━━━━━━━━\n';
+    p += '【カテゴリ】: ' + (iq.category || '未設定') + '\n';
+    p += '【難易度】: ' + ({'3':'難しい','2':'普通','1':'簡単'}[String(iq.difficulty)] || '普通') + '\n';
+    p += '━━━━━━━━━━━━━━━━━━━━━━\n\n';
+    p += '【質問】:\n' + (iq.question || '（未入力）') + '\n\n';
+
+    if (iq.answer && iq.answer.trim()) {
+        p += '【現在の回答案】:\n' + iq.answer + '\n\n';
+    }
+    if (iq.points && iq.points.trim()) {
+        p += '【自分が意識しているポイント】:\n' + iq.points + '\n\n';
+    }
+    if (iq.caution && iq.caution.trim()) {
+        p += '【注意しようと思っている点】:\n' + iq.caution + '\n\n';
+    }
+    if (iq.record && iq.record.trim()) {
+        p += '【過去に聞かれた際の記録・感触】:\n' + iq.record + '\n\n';
+    }
+
+    p += '━━━━━━━━━━━━━━━━━━━━━━\n';
+    p += '【お願いしたいこと】:\n';
+
+    if (iq.answer && iq.answer.trim()) {
+        p += '① 上記の回答案の良い点・改善点を具体的に教えてください\n';
+        p += '② より伝わりやすい言い回しや構成に修正した改善版を作成してください\n';
+        p += '③ この回答に対して面接官がさらに深掘りしそうな質問を3つ挙げ、それぞれの対応策を教えてください\n';
+        p += '④ 同じ質問に対して「短め（30秒）」と「詳しめ（1分半）」の2パターンの模範回答を作成してください\n';
+    } else {
+        p += '① この質問に対する模範回答を「短め（30秒）」と「詳しめ（1分半）」の2パターン作成してください\n';
+        p += '② 回答を構成する際のポイント・フレームワークを教えてください\n';
+        p += '③ この質問で面接官が本当に確認したいことは何か説明してください\n';
+        p += '④ この質問に対して避けるべきNG回答の例と、その理由を教えてください\n';
+    }
+    p += '⑤ この質問が来たときの心構えや、緊張をほぐすテクニックがあれば教えてください';
+
+    showAiModal('🤖 AI相談｜' + (iq.question || '').substring(0, 30) + ((iq.question||'').length > 30 ? '…' : ''), p);
+}
+
+
+function deleteIq(id) {
+    if (!confirm('このQ&Aを削除しますか？')) return;
+    iqData = iqData.filter(function(e){ return e.id !== id; });
+    persistIqData();
+    renderIqBank();
+    showToast('🗑 削除しました');
+}
+
+
+// ========================
+// EVENTS
+// ========================
+function addEventItem(data = {}, idx = -1) {
+    const div = document.createElement('div');
+    div.className = 'event-item';
+    div.style.cssText = 'display:flex; gap:8px; margin-bottom:8px; align-items:center;';
+    div.innerHTML = `
+        <input type="date" class="ev-date" value="${data.date||''}" style="width:160px; flex-shrink:0;">
+        <input type="text" class="ev-title" value="${escapeHtml(data.title||'')}" placeholder="例：1次面接" style="flex:1;">
+        <button type="button" class="btn btn-google btn-sm" onclick="addToGoogle('event', ${idx})">G登録</button>
+        <button type="button" class="btn btn-sm btn-danger" onclick="this.parentElement.remove()">×</button>
+    `;
+    document.getElementById('eventListContainer').appendChild(div);
+}
+
+// ========================
+// GOOGLE CALENDAR
+// ========================
+function addToGoogle(type, eventIdx = -1) {
+    const company = document.getElementById('companyInput').value;
+    let title = '', dateVal = '';
+    if (type === 'deadline') {
+        title = `【ES締切】${company}`; dateVal = document.getElementById('deadlineInput').value;
+    } else {
+        const evDivs = document.querySelectorAll('#eventListContainer .event-item');
+        if (evDivs[eventIdx]) { title = `【選考】${company}：${evDivs[eventIdx].querySelector('.ev-title').value}`; dateVal = evDivs[eventIdx].querySelector('.ev-date').value; }
+    }
+    if (!company || !dateVal) { alert('企業名と日付を入力してください'); return; }
+    const dateStr = dateVal.replace(/-/g, '');
+    const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${dateStr}/${dateStr}&details=${encodeURIComponent(company + 'の予定')}`;
+    window.open(url, '_blank');
+}
+
+// ========================
+// CALENDAR
+// ========================
+function renderCalendar() {
+    const grid = document.getElementById('calendarGrid');
+    const year = calDate.getFullYear();
+    const month = calDate.getMonth();
+    grid.innerHTML = '';
+    document.getElementById('currentMonthLabel').textContent = `${year}年 ${month + 1}月`;
+
+    const first = new Date(year, month, 1).getDay();
+    const days  = new Date(year, month + 1, 0).getDate();
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    for (let i = 0; i < first; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'cal-day';
+        empty.style.background = '#f8fafc';
+        grid.appendChild(empty);
+    }
+
+    for (let d = 1; d <= days; d++) {
+        const ds = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+        const cell = document.createElement('div');
+        cell.className = 'cal-day' + (ds === todayStr ? ' cal-today' : '');
+        cell.innerHTML = `<div class="cal-day-label" style="color:${new Date(ds).getDay()===0?'#f43f5e':new Date(ds).getDay()===6?'#3b82f6':'inherit'}">${d}</div>`;
+
+        esData.forEach(es => {
+            if (es.deadline === ds) {
+                cell.innerHTML += `<div onclick="showPreview('${es.id}')" style="font-size:10px; background:var(--deadline-color); color:white; padding:3px 5px; border-radius:4px; margin-top:3px; cursor:pointer; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🗓 ${escapeHtml(es.company)}</div>`;
+            }
+            (es.events ||[]).forEach(ev => {
+                if (ev.date === ds) {
+                    cell.innerHTML += `<div onclick="showPreview('${es.id}')" style="font-size:10px; background:var(--event-color); color:white; padding:3px 5px; border-radius:4px; margin-top:3px; cursor:pointer; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📋 ${escapeHtml(ev.title)} (${escapeHtml(es.company.substring(0,4))})</div>`;
+                }
+            });
+        });
+        grid.appendChild(cell);
+    }
+}
+window.changeMonth = off => { calDate.setMonth(calDate.getMonth() + off); renderCalendar(); };
+
+// ========================
+// PROOF IMAGE & OCR
+// ========================
+async function handleProofImg(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const base64 = await resizeImage(file, 800);
+    currentProofImgBase64 = base64;
+    renderProofPreview(base64);
+}
+function resizeImage(file, maxWidth) {
+    return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                let w = img.width, h = img.height;
+                if (w > maxWidth) { h = Math.round(h * maxWidth / w); w = maxWidth; }
+                canvas.width = w; canvas.height = h;
+                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+function renderProofPreview(base64) {
+    const area = document.getElementById('proofImgPreviewArea');
+    if (!base64) { area.innerHTML = ''; return; }
+    area.innerHTML = `<img src="${base64}" class="proof-img-preview" onclick="viewFullImage('${base64}')"><button class="btn btn-sm btn-danger" style="position:absolute; top:0; right:0;" onclick="removeProofImg()">×</button>`;
+}
+function removeProofImg() { currentProofImgBase64 = ""; renderProofPreview(""); }
+function viewFullImage(src) { document.getElementById('fullImage').src = src; document.getElementById('fullImageOverlay').classList.add('active'); }
+
+async function handleOcr(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const loading = document.getElementById('ocrLoading');
+    loading.style.display = 'flex';
+    try {
+        const worker = await Tesseract.createWorker('jpn');
+        const ret = await worker.recognize(file);
+        addQaItem({ question: 'OCR(' + new Date().toLocaleTimeString() + ')', answer: ret.data.text });
+        await worker.terminate();
+        showToast('📷 文字起こし完了');
+    } catch { alert('OCR解析に失敗しました。'); }
+    finally { loading.style.display = 'none'; e.target.value = ''; }
+}
+
+// ========================
+// DATA IO
+// ========================
+window.downloadData = () => {
+    const blob = new Blob([JSON.stringify(esData, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = `ES_Manager_Backup_${new Date().toISOString().split('T')[0]}.json`;
+    a.click(); showToast('💾 バックアップを保存しました');
+};
+
+window.importData = input => {
+    const file = input.files[0];
+    if (!file) return;
+
+    const r = new FileReader();
+    r.onload = e => {
+        // UIスレッドのブロックを回避し、安全に処理するため少し遅延を入れる
+        setTimeout(() => {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                const arr = Array.isArray(parsed) ? parsed : (parsed && parsed.data && Array.isArray(parsed.data)) ? parsed.data : null;
+                
+                if (!arr) { 
+                    alert('無効なファイル形式です。バックアップしたJSONファイルを選択してください。'); 
+                    return; 
+                }
+                
+                const normalized = arr.map(normalizeEntry).filter(Boolean);
+                if (normalized.length === 0) { 
+                    alert('データがありません'); 
+                    return; 
+                }
+
+                const addMode = confirm(`${normalized.length}件のデータが見つかりました。\n\n[OK] 既存のデータに追加する\n[キャンセル] 既存のデータを上書きする`);
+                
+                if (addMode) {
+                    const existingIds = new Set(esData.map(d => d.id));
+                    let added = 0;
+                    normalized.forEach(entry => { 
+                        if (!existingIds.has(entry.id)) { esData.push(entry); added++; } 
+                    });
+                    persistData(); 
+                    renderList(); 
+                    showToast(`✅ ${added}件を追加しました`);
+                } else {
+                    if (confirm('⚠️現在のデータをすべて削除して、ファイルの内容で上書きします。よろしいですか？')) {
+                        esData = normalized; 
+                        persistData(); 
+                        renderList(); 
+                        showToast(`✅ ${esData.length}件をインポートしました`);
+                    }
+                }
+            } catch (err) { 
+                alert('読み込みに失敗しました。正しいJSONファイルを選択してください。\n詳細: ' + err.message); 
+            } finally {
+                // すべての処理が終わってから input の value をリセットする
+                input.value = '';
+            }
+        }, 50);
+    };
+
+    r.onerror = () => {
+        alert('ファイルの読み取り中にエラーが発生しました。');
+        input.value = '';
+    };
+
+    r.readAsText(file);
+};
+
+window.deleteItem = id => {
+    if (!confirm('この案件を完全に削除しますか？')) return;
+    esData = esData.filter(d => d.id !== id); persistData(); renderList(); showToast('🗑 削除しました');
+};
+
+// ========================
+// UTILITY
+// ========================
+function escapeHtml(s) { return s ? String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : ''; }
+let toastTimer;
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+// ========================
+// スマホ転送
+// ========================
+function openMobileTransfer() {
+    // エクスポートテキストを生成
+    var allData = {
+        esData: esData,
+        templateData: templateData,
+        episodeData: episodeData,
+        iqData: iqData,
+        exportedAt: new Date().toISOString(),
+        version: 'v10'
+    };
+    document.getElementById('mtExportText').value = JSON.stringify(allData, null, 2);
+    switchMtTab('export');
+    document.getElementById('mobileTransferModal').classList.add('active');
+}
+
+function closeMobileTransfer() {
+    document.getElementById('mobileTransferModal').classList.remove('active');
+    document.getElementById('mtImportText').value = '';
+    document.getElementById('mtImportStatus').textContent = '';
+    document.getElementById('mtCopyFeedback').style.display = 'none';
+}
+
+function switchMtTab(tab) {
+    var isExport = tab === 'export';
+    document.getElementById('mtPanelExport').style.display = isExport ? 'block' : 'none';
+    document.getElementById('mtPanelImport').style.display = isExport ? 'none' : 'block';
+    document.getElementById('mtTabExport').style.borderBottomColor = isExport ? '#0284c7' : 'transparent';
+    document.getElementById('mtTabExport').style.color = isExport ? '#0284c7' : '#64748b';
+    document.getElementById('mtTabImport').style.borderBottomColor = isExport ? 'transparent' : '#0284c7';
+    document.getElementById('mtTabImport').style.color = isExport ? '#64748b' : '#0284c7';
+}
+
+function mtSelectAll() {
+    var ta = document.getElementById('mtExportText');
+    ta.select();
+    ta.setSelectionRange(0, 99999); // iOS対応
+    var text = ta.value;
+    var fb = document.getElementById('mtCopyFeedback');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function() {
+            fb.style.display = 'inline';
+            setTimeout(function(){ fb.style.display = 'none'; }, 2500);
+        }).catch(function() {
+            // fallback: textareaを選択状態にしてユーザーに手動コピーを促す
+            fb.style.display = 'none';
+            alert('テキストエリアが選択されました。長押し→「コピー」で手動でコピーしてください。');
+        });
+    } else {
+        // iOS Safari fallback
+        try {
+            document.execCommand('copy');
+            fb.style.display = 'inline';
+            setTimeout(function(){ fb.style.display = 'none'; }, 2500);
+        } catch(e) {
+            alert('テキストエリアが選択されました。長押し→「コピー」で手動でコピーしてください。');
+        }
+    }
+}
+
+function mtImportFromText() {
+    var text = document.getElementById('mtImportText').value.trim();
+    var statusEl = document.getElementById('mtImportStatus');
+    if (!text) { statusEl.textContent = '⚠️ テキストが入力されていません'; return; }
+
+    var parsed;
+    try { parsed = JSON.parse(text); }
+    catch(e) { statusEl.textContent = '❌ 形式が正しくありません。完全なバックアップテキストを貼り付けてください。'; return; }
+
+    // 全データ形式（openMobileTransferで出力したもの）
+    if (parsed.version && parsed.esData) {
+        var confirmed = confirm('以下のデータが見つかりました。\n\n' + '・案件データ: ' + (parsed.esData ? parsed.esData.length : 0) + '件\n' + '・ESテンプレ: ' + (parsed.templateData && parsed.templateData.qas ? parsed.templateData.qas.length : 0) + '件\n' + '・エピソード: ' + (parsed.episodeData ? parsed.episodeData.length : 0) + '件\n' + '・想定Q&A: ' + (parsed.iqData ? parsed.iqData.length : 0) + '件\n\n' + '現在のデータをすべて上書きしてインポートしますか？')
+        if (!confirmed) return;
+
+        if (parsed.esData && Array.isArray(parsed.esData)) {
+            esData = parsed.esData.map(normalizeEntry).filter(Boolean);
+            persistData();
+        }
+        if (parsed.templateData) {
+            templateData = parsed.templateData;
+            if (!Array.isArray(templateData.qas)) templateData.qas = [];
+            persistTemplateData();
+        }
+        if (parsed.episodeData && Array.isArray(parsed.episodeData)) {
+            episodeData = parsed.episodeData;
+            persistEpisodeData();
+        }
+        if (parsed.iqData && Array.isArray(parsed.iqData)) {
+            iqData = parsed.iqData;
+            persistIqData();
+        }
+        renderList();
+        closeMobileTransfer();
+        showToast('✅ すべてのデータをインポートしました');
+        return;
+    }
+
+    // 旧来の esData 配列形式も受け付ける（後方互換）
+    var arr = Array.isArray(parsed) ? parsed
+        : (parsed.data && Array.isArray(parsed.data)) ? parsed.data
+        : null;
+    if (!arr) { statusEl.textContent = '❌ 対応していない形式です。'; return; }
+
+    var normalized = arr.map(normalizeEntry).filter(Boolean);
+    if (normalized.length === 0) { statusEl.textContent = '❌ 読み込めるデータがありませんでした。'; return; }
+
+    var addMode = confirm(normalized.length + '件の案件データが見つかりました。\n\n[OK] 既存データに追加\n[キャンセル] 上書き');
+    if (addMode) {
+        var existingIds = new Set(esData.map(function(d){ return d.id; }));
+        var added = 0;
+        normalized.forEach(function(entry){
+            if (!existingIds.has(entry.id)) { esData.push(entry); added++; }
+        });
+        persistData(); renderList();
+        closeMobileTransfer();
+        showToast('✅ ' + added + '件を追加しました');
+    } else {
+        if (confirm('現在のデータをすべて削除して上書きしますか？')) {
+            esData = normalized; persistData(); renderList();
+            closeMobileTransfer();
+            showToast('✅ ' + esData.length + '件をインポートしました');
+        }
+    }
+}
+
+
+</script>
+</body>
+</html>
