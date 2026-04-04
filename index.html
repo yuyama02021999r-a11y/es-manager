@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ES Manager Pro - Ultimate v10 (Mobile Optimized)</title>
+    <title>ES Manager Pro - Ultimate v11 (Mobile Optimized)</title>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         :root {
@@ -702,7 +702,7 @@
 <div class="container">
     <header>
         <h1>🚀 ES Manager Pro
-            <span style="font-size:12px; font-weight:600; background:#e0e7ff; color:#4338ca; padding:3px 9px; border-radius:6px;">v10</span>
+            <span style="font-size:12px; font-weight:600; background:#e0e7ff; color:#4338ca; padding:3px 9px; border-radius:6px;">v11</span>
         </h1>
         <div id="mainActions">
             <button id="createBtn" class="btn btn-primary">＋ 新規案件</button>
@@ -813,9 +813,8 @@
                     </div>
                 </div>
                 <div>
-                    <label>提出証明スクリーンショット</label>
-                    <input type="file" id="proofImgInput" accept="image/*" style="font-size:14px !important;">
-                    <div id="proofImgPreviewArea" class="proof-img-container"></div>
+                    <label>📝 案件メモ（自由メモ・提出予定なし）</label>
+                    <textarea id="notesInput" rows="3" placeholder="面接の感想、気になったこと、自分用のメモなど自由に…" style="resize:vertical; line-height:1.6;"></textarea>
                 </div>
             </div>
 
@@ -1275,7 +1274,6 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('addQaBtn').addEventListener('click', () => addQaItem({}));
     document.getElementById('searchInput').addEventListener('input', renderQaSearch);
     document.getElementById('ocrInput').addEventListener('change', handleOcr);
-    document.getElementById('proofImgInput').addEventListener('change', handleProofImg);
 });
 
 // ========================
@@ -1293,6 +1291,7 @@ function normalizeEntry(raw) {
         myPagePass: raw.myPagePass || raw.password || raw.pass || raw.pw || '',
         deadline: raw.deadline || raw.dueDate || raw.due || raw.limitDate || '',
         proofImg: raw.proofImg || raw.proof || raw.screenshot || raw.img || '',
+        notes: raw.notes || raw.memo_notes || raw.freeNote || '',
         research: (function(){
             const r = raw.research || {};
             const g = (...keys) => keys.map(k => r[k] || raw[k] || '').find(Boolean) || '';
@@ -1544,7 +1543,7 @@ function renderList() {
                     <div style="font-size:12px; color:#64748b; margin-top:5px; display:flex; gap:10px; flex-wrap:wrap;">
                         <span>📌 ${item.deadline || '期限未設定'}</span>
                         ${item.myPageUrl ? '<span>🌐 リンクあり</span>' : ''}
-                        ${item.proofImg ? '<span>🖼 証明あり</span>' : ''}
+                        ${item.notes && item.notes.trim() ? '<span>📝 メモあり</span>' : ''}
                         ${totalQas > 0 ? `<span>📝 ${answeredQas}/${totalQas}問回答済</span>` : ''}
                     </div>
                     ${totalQas > 0 ? `
@@ -1583,8 +1582,20 @@ function showPreview(id) {
         ${item.myPageUrl ? `<a href="${escapeHtml(item.myPageUrl)}" target="_blank" class="btn btn-sm btn-secondary" style="color:var(--mypage-color);">🌐 マイページ</a>` : ''}
     </div>`;
 
-    if (item.proofImg) {
-        html += `<div style="margin-bottom:18px;"><div style="font-size:12px; font-weight:700; color:#64748b; margin-bottom:6px;">提出証明</div><img src="${item.proofImg}" class="proof-img-preview" onclick="viewFullImage('${item.proofImg}')"></div>`;
+    if (item.myPageUrl || item.myPageId || item.myPagePass) {
+        html += `<div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:14px; margin-bottom:18px;">
+            <div style="font-size:12px; font-weight:800; color:#166534; margin-bottom:10px; text-transform:uppercase; letter-spacing:0.04em;">🌐 マイページ・ログイン情報</div>`;
+        if (item.myPageUrl) html += `<div style="font-size:13px; margin-bottom:6px;"><strong style="color:#64748b;">URL:</strong> <a href="${escapeHtml(item.myPageUrl)}" target="_blank" rel="noopener" style="color:var(--mypage-color); word-break:break-all;">${escapeHtml(item.myPageUrl)}</a></div>`;
+        if (item.myPageId) html += `<div style="font-size:13px; margin-bottom:6px; display:flex; align-items:center; gap:8px;"><strong style="color:#64748b;">ID:</strong> <code style="background:#e2e8f0; padding:3px 10px; border-radius:5px; font-size:13px; user-select:all; cursor:text;">${escapeHtml(item.myPageId)}</code><button class="btn btn-xs btn-secondary" onclick="copyToClipboard('${escapeHtml(item.myPageId).replace(/'/g,"\\'")}')">📋</button></div>`;
+        if (item.myPagePass) html += `<div style="font-size:13px; display:flex; align-items:center; gap:8px;"><strong style="color:#64748b;">PASS:</strong> <code id="passField_${item.id}" style="background:#e2e8f0; padding:3px 10px; border-radius:5px; font-size:13px; user-select:all; cursor:text; letter-spacing:0.05em;">••••••••</code><button class="btn btn-xs btn-secondary" onclick="togglePassVisibility('${item.id}','${escapeHtml(item.myPagePass).replace(/'/g,"\\'")}')">👁</button><button class="btn btn-xs btn-secondary" onclick="copyToClipboard('${escapeHtml(item.myPagePass).replace(/'/g,"\\'")}')">📋</button></div>`;
+        html += `</div>`;
+    }
+
+    if (item.notes && item.notes.trim()) {
+        html += `<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:14px; margin-bottom:18px;">
+            <div style="font-size:12px; font-weight:800; color:#92400e; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.04em;">📝 メモ</div>
+            <div style="font-size:14px; color:#374151; white-space:pre-wrap; line-height:1.7;">${escapeHtml(item.notes)}</div>
+        </div>`;
     }
 
     if (item.research && (item.research.philosophy || item.research.strengths)) {
@@ -1620,7 +1631,8 @@ function openNewEditor() {
     currentId = null;
     isFavorite = false;
     currentProofImgBase64 = "";
-    document.getElementById('editorTitle').textContent = "新規案件作成";['companyInput','myPageUrlInput','myPageIdInput','myPagePassInput','deadlineInput'].forEach(id => document.getElementById(id).value = '');['founded','capital','employees','vision','business','strengths','weaknesses',
+    document.getElementById('editorTitle').textContent = "新規案件作成";['companyInput','myPageUrlInput','myPageIdInput','myPagePassInput','deadlineInput'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('notesInput').value = '';['founded','capital','employees','vision','business','strengths','weaknesses',
      'salary','salaryInc','location','workHours','vacation',
      'why','targetDept','philosophy','appealStr','appealVision','appealBiz',
      'requirements','entryDeadline','selectionFlow'].forEach(k => {['res_'+k, 'res_'+k+'_m'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
@@ -1630,7 +1642,6 @@ function openNewEditor() {
     document.getElementById('starBtn').classList.remove('btn-primary');
     document.getElementById('eventListContainer').innerHTML = '';
     document.getElementById('qaContainer').innerHTML = '';
-    renderProofPreview("");
     addQaItem({});
     switchTab('editorView');
 }
@@ -1649,6 +1660,7 @@ function editItem(id) {
     document.getElementById('myPageIdInput').value     = item.myPageId || '';
     document.getElementById('myPagePassInput').value   = item.myPagePass || '';
     document.getElementById('deadlineInput').value     = item.deadline || '';
+    document.getElementById('notesInput').value        = item.notes || '';
     
     const _r = item.research || {};['founded','capital','employees','vision','business','strengths','weaknesses',
      'salary','salaryInc','location','workHours','vacation',
@@ -1659,8 +1671,6 @@ function editItem(id) {
     });
     document.getElementById('starIcon').textContent    = isFavorite ? '★' : '☆';
     document.getElementById('starBtn').classList.toggle('btn-primary', isFavorite);
-
-    renderProofPreview(currentProofImgBase64);
 
     document.getElementById('eventListContainer').innerHTML = '';
     (item.events ||[]).forEach((ev, idx) => addEventItem(ev, idx));
@@ -1686,7 +1696,8 @@ function saveData() {
         myPageId:   document.getElementById('myPageIdInput').value,
         myPagePass: document.getElementById('myPagePassInput').value,
         deadline:   document.getElementById('deadlineInput').value,
-        proofImg:   currentProofImgBase64,
+        proofImg:   '',
+        notes:      document.getElementById('notesInput').value,
         research: (function(){
             const obj = {};['founded','capital','employees','vision','business','strengths','weaknesses',
              'salary','salaryInc','location','workHours','vacation',
@@ -3193,6 +3204,18 @@ window.deleteItem = id => {
 // UTILITY
 // ========================
 function escapeHtml(s) { return s ? String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])) : ''; }
+
+function togglePassVisibility(itemId, pass) {
+    const el = document.getElementById('passField_' + itemId);
+    if (!el) return;
+    if (el.dataset.visible === '1') {
+        el.textContent = '••••••••';
+        el.dataset.visible = '0';
+    } else {
+        el.textContent = pass;
+        el.dataset.visible = '1';
+    }
+}
 let toastTimer;
 function showToast(msg) {
     const t = document.getElementById('toast');
@@ -3210,7 +3233,7 @@ function openMobileTransfer() {
         episodeData: episodeData,
         iqData: iqData,
         exportedAt: new Date().toISOString(),
-        version: 'v10'
+        version: 'v11'
     };
     document.getElementById('mtExportText').value = JSON.stringify(allData, null, 2);
     switchMtTab('export');
